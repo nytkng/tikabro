@@ -11,6 +11,7 @@ import Seal from "@/components/ui/Seal";
 import {pickOf} from "@/lib/model";
 import {weekVersus} from "@/lib/versus";
 import {db} from "@/lib/db";
+import {probHistoryMany} from "@/components/viz/data";
 import type {Match,Sport} from "@/lib/types";
 import {getLang} from "@/lib/lang";
 import {t,locOf,leagueOf,type Key,type Lang} from "@/lib/i18n";
@@ -47,15 +48,28 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
   const tm=(iso:string)=>new Date(iso).toLocaleTimeString(locOf(lang),{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Algiers"});
   const liveList=inSport.filter(m=>m.state==="live").sort((a,b)=>rank(a.slug)-rank(b.slug));
   const st={live:ms.filter(m=>m.state==="live").length,pre:ms.filter(m=>m.state==="pre").length,post:ms.filter(m=>m.state==="post").length};
+  // تاريخ الاحتمالات لكل الماتشات الجاية — استعلام واحد
+  const hid=(m:Match)=>`${m.id.split("-")[0]}:${m.id.split(":")[1]||""}`;
+  const upIds=ms.filter(m=>m.state==="pre"&&m.probs&&!m.sample).map(hid).slice(0,150);
+  // حالة فارغة: نقترح أقرب رياضة/نهار فيه ماتشات
+  const nextDay=(()=>{const n=new Date(date+"T12:00:00Z");n.setUTCDate(n.getUTCDate()+1);return n.toISOString().slice(0,10)})();
+  const otherSport=sports.find(x=>x[1]!==cur&&(counts.get(x[1])||0)>0);
+  const [hm,nextList]=await Promise.all([probHistoryMany(upIds).catch(()=>new Map<string,[number,number,number][]>()),
+    !ms.length&&!sp.l&&!sp.live&&!otherSport?getDay(nextDay).catch(()=>[]):Promise.resolve([] as Match[])]);
+  const nextHas=nextList.some(m=>m.sport===cur);
+  const empty:{msg:string;href?:string;cta?:string}=sp.l||sp.live?{msg:t(lang,sp.live?"d2.empty_live":"d2.empty_t"),href:q({}),cta:t(lang,"d2.all")}
+    :otherSport?{msg:t(lang,"d2.empty_t"),href:q({s:otherSport[1]}),cta:t(lang,"d2.empty_next",{x:`${otherSport[2]} ${t(lang,otherSport[0])} (${counts.get(otherSport[1])})`})}
+    :nextHas?{msg:t(lang,"d2.empty_t"),href:q({d:nextDay}),cta:t(lang,"d2.empty_next",{x:nextDay===algDate(1)?t(lang,"h.tomorrow"):dmLabel(nextDay,lang)})}
+    :{msg:t(lang,date===today?"h.none_today":"h.none_day")};
   const tp=top?.probs,tpk=tp?pickOf(tp):null,tlabel=tpk==="h"?top!.home:tpk==="a"?top!.away:t(lang,"draw");
-  const medals=["#FFB020","#C8CEDD","#C98A55"];
+  const medals=["#D9DEE8","#A9B0BE","#C98A55"];
   return(<>
    <LiveRefresh on={liveAll>0}/>
    <TrustLine lang={lang}/>
    <span hidden data-live-count={liveAll}/>
    {/* الرياضات */}
    <nav aria-label={t(lang,"h.sports")} className="flex gap-2 mb-4 overflow-x-auto scroll-x -mx-3 px-3 sm:mx-0 sm:px-0">{[...sports.map(([tk,k,ic])=><a key={k} href={q({s:k})} aria-current={k===cur?"page":undefined} className={"sport-pill "+(k===cur?"on":"")}><span aria-hidden className="text-base">{ic}</span>{t(lang,tk)}<span className="cnt tabular-nums">{counts.get(k)||0}</span></a>),...([[t(lang,"sp.tennis"),"tennis","🎾"],[t(lang,"sp.golf"),"golf","⛳"],[t(lang,"sp.f1"),"f1","🏎️"],["UFC","ufc","🥊"],["سباقات السيارات","racing","🏁"]] as const).map(([tt,k,ic])=><a key={k} href={`/individual/${k}`} className="sport-pill"><span aria-hidden className="text-base">{ic}</span>{tt}</a>)]}</nav>
-   {sample&&<div role="status" className="mb-4 rounded-xl border border-amber/40 bg-[#2A2110] text-amber text-sm px-4 py-3">{t(lang,"h.sample")}</div>}
+   {sample&&<div role="status" className="mb-4 rounded-xl border border-line bg-s2 text-[#C9CCE0] text-sm px-4 py-3">{t(lang,"h.sample")}</div>}
    <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)_320px]">
     {/* العمود الأيمن: الدوريات */}
     <aside className="hidden lg:block" aria-label={t(lang,"h.leagues")}>
@@ -74,13 +88,13 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
      {top&&!sp.l&&!sp.live&&<article className="stage relative rounded-[22px] p-4 sm:p-7 mb-5 overflow-hidden">
       <div className="relative flex items-center justify-between gap-3 text-xs text-[#C9CCE0]">
        <span className="flex items-center gap-2 min-w-0">{top.leagueLogo?<img src={top.leagueLogo} alt="" width={18} height={18} referrerPolicy="no-referrer" className="w-[18px] h-[18px] object-contain"/>:null}<span className="truncate">{leagueOf(top,lang)}</span></span>
-       <span className={"shrink-0 rounded-full px-3 py-1 font-semibold "+(top.state==="live"?"bg-pink/15 text-pink":"bg-amber/15 text-amber")}>{top.state==="live"?t(lang,"live_now"):t(lang,"h.match_of_day")}</span>
+       <span className={"shrink-0 rounded-full px-3 py-1 font-semibold "+(top.state==="live"?"bg-pink/15 text-pink":"bg-white/10 text-[#E8EAF2]")}>{top.state==="live"?t(lang,"live_now"):t(lang,"h.match_of_day")}</span>
       </div>
       <div className="relative grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4 mt-5">
        <div className="flex flex-col items-center gap-2.5 text-center min-w-0"><Crest name={top.home} size={72} logo={top.homeLogo}/><b className="text-white text-sm sm:text-base leading-6 line-clamp-2"><bdi>{top.home}</bdi></b>{top.homeRec&&<span className="text-[11px] text-mute tabular-nums">{fmtRec(top.homeRec,lang)}</span>}</div>
        <div className="text-center scoreboard px-3 sm:px-5 py-3 rounded-2xl">
         {top.score?<><div className="font-display text-[44px] sm:text-6xl leading-none text-white tabular-nums" dir="ltr">{top.score[0]}<span className="text-mute mx-1.5">:</span>{top.score[1]}</div>{top.state==="live"&&<div className="mt-2 inline-flex items-center gap-1.5 text-pink text-xs font-semibold"><i className="live-dot !mb-0"/>{top.clock||t(lang,"live")}</div>}</>
-        :<><div className="font-display text-[34px] sm:text-5xl leading-none text-white tabular-nums">{tm(top.kickoff)}</div><div className="mt-2 text-[11px] text-mute">{t(lang,"h.kick_in")} <Countdown lang={lang} to={top.kickoff} className="text-amber font-semibold tabular-nums"/></div></>}
+        :<><div className="font-display text-[34px] sm:text-5xl leading-none text-white tabular-nums">{tm(top.kickoff)}</div><div className="mt-2 text-[11px] text-mute">{t(lang,"h.kick_in")} <Countdown lang={lang} to={top.kickoff} className="text-white font-semibold tabular-nums"/></div></>}
        </div>
        <div className="flex flex-col items-center gap-2.5 text-center min-w-0"><Crest name={top.away} size={72} logo={top.awayLogo}/><b className="text-white text-sm sm:text-base leading-6 line-clamp-2"><bdi>{top.away}</bdi></b>{top.awayRec&&<span className="text-[11px] text-mute tabular-nums">{fmtRec(top.awayRec,lang)}</span>}</div>
       </div>
@@ -130,11 +144,12 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
         <a href={list[0].slug&&list[0].slug!=="all"?`/league/${list[0].id.split("-")[0]}/${list[0].slug}`:q({l:name})} className="text-[11px] text-violet hover:text-white px-2 min-h-11 inline-flex items-center">{t(lang,"h.league")}</a>
         <span aria-hidden className="chev"/>
        </summary>
-       <div className="p-1.5 flex flex-col">{list.map(m=><MatchRow key={m.id} m={m} lang={lang}/>)}</div>
+       <div className="p-1.5 flex flex-col">{list.map(m=><MatchRow key={m.id} m={m} lang={lang} hist={hm.get(hid(m))}/>)}</div>
        <p className="empty-note text-xs text-mute px-4 pb-3">{t(lang,"h.empty_filter")}</p>
       </details>)}</div>
      </div>
-     :<p className="panel text-mute p-10 text-center leading-7">{t(lang,date===today?"h.none_today":"h.none_day")}</p>}
+     :<div className="panel p-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-start"><p className="text-sm text-[#C9CCE0] leading-6">{empty.msg}</p>
+      {empty.href&&<a href={empty.href} className="shrink-0 inline-flex items-center gap-1.5 h-11 px-4 rounded-xl border border-line bg-s3 text-sm font-semibold text-white hover:border-[#3A4352]">{empty.cta}<span aria-hidden>{lang==="ar"?"←":"→"}</span></a>}</div>}
     </section>
     {/* العمود الأيسر */}
     <aside className="flex flex-col gap-4 lg:sticky lg:top-20 self-start" aria-label={t(lang,"h.competition")}>
@@ -145,7 +160,7 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
         <a href={`/u/${encodeURIComponent(x.nick)}`} className="flex items-center gap-3 py-2 px-2 -mx-2 rounded-xl hover:bg-hover min-h-11">
         {i<3?<span className="medal" style={{["--m" as string]:medals[i]}}>{i+1}</span>:<span className="w-7 h-7 rounded-full grid place-items-center text-xs font-bold bg-line text-[#C9CCE0] tabular-nums">{i+1}</span>}
         <span className="flex-1 truncate text-sm text-white"><bdi>{x.nick}</bdi></span>
-        <span className="text-xs text-mute tabular-nums" dir="ltr">{x.hits}/{x.n}</span><b className="text-sm text-amber tabular-nums w-10 text-end">{x.points}</b></a></li>)}</ol>
+        <span className="text-xs text-mute tabular-nums" dir="ltr">{x.hits}/{x.n}</span><b className="text-sm text-white tabular-nums w-10 text-end">{x.points}</b></a></li>)}</ol>
       :<p className="text-sm text-mute leading-7">{t(lang,"h.rank_empty")}</p>}
      </section>
      <section className="panel p-5" aria-labelledby="how-h">

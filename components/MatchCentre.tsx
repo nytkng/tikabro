@@ -123,7 +123,7 @@ export default async function MatchCentre({id,lang="ar",part="all"}:{id:string;l
  return(<div className="flex flex-col gap-6 min-w-0">
   {on("stats")&&d.events.length>0&&<Card t={t(lang,"mc.events")}><ol className="flex flex-col gap-2">{d.events.map((e,i)=>
    <li key={i} className={"flex items-center gap-3 text-sm "+(e.side==="away"?"flex-row-reverse text-end":"")}>
-    <span className="w-12 flex-none text-center font-display text-amber tabular-nums" dir="ltr">{e.min}</span>
+    <span className="w-12 flex-none text-center font-display text-[#C9CCE0] tabular-nums" dir="ltr">{e.min}</span>
     <span className="flex-none" aria-label={kt(e.kind)}>{ICON[e.kind]}</span>
     <span className="min-w-0 truncate text-white"><L>{e.who}</L>{e.kind==="sub"&&e.who2?<span className="text-mute"> ← <L>{e.who2}</L></span>:null}<span className="text-mute text-xs"> · {kt(e.kind)}</span></span>
    </li>)}</ol>

@@ -13,6 +13,16 @@ export async function probHistory(matchId:string,pick:"h"|"d"|"a"){
   return r.map(x=>x[f]).filter((v):v is number=>v!=null).map(v=>Math.round(sc(v)));
 }
 
+// تاريخ الاحتمالات لعدة ماتشات في استعلام واحد → {id:[[h,d,a],...]}
+export async function probHistoryMany(ids:string[]){
+  const out=new Map<string,[number,number,number][]>();if(!ids.length)return out;
+  const q=encodeURIComponent(ids.map(x=>`"${x}"`).join(","));
+  const r=await db<{match_id:string;ph:number|null;pd:number|null;pa:number|null}[]>(`prob_history?match_id=in.(${q})&select=match_id,ph,pd,pa&order=at.asc&limit=4000`).catch(()=>null);
+  for(const x of r||[]){if(x.ph==null||x.pa==null)continue;const a=out.get(x.match_id)||[];a.push([Math.round(sc(x.ph)),Math.round(sc(x.pd??0)),Math.round(sc(x.pa))]);out.set(x.match_id,a)}
+  for(const [k,v] of out){if(v.length<2)out.delete(k);else if(v.length>12){const st=(v.length-1)/11;out.set(k,Array.from({length:12},(_,i)=>v[Math.round(i*st)]))}}
+  return out;
+}
+
 const rec=(s?:string|null)=>{if(!s||!/^\d+(-\d+){1,2}$/.test(s))return null;const a=s.split("-").map(Number);const w=a[0],d=a.length===3?a[1]:0,l=a[a.length-1];return w+d+l>0?{w,d,l,n:w+d+l}:null};
 
 export async function teamViz(sport:string,ids:{h:string;a:string},m:{homeRec?:string|null;awayRec?:string|null;home:string;away:string},lang:Lang){

@@ -14,7 +14,7 @@ export function smooth(pts:[number,number][]):string{
 }
 
 /* ===== صناديق الفورمة ف/ت/خ ===== */
-const FC:Record<string,string>={W:"bg-teal text-bg",D:"bg-[#4A5273] text-white",L:"bg-pink text-bg"};
+const FC:Record<string,string>={W:"bg-win text-bg",D:"bg-draw text-bg",L:"bg-loss text-white"};
 export function FormBoxes({f,lang,size="sm"}:{f?:string|null;lang:Lang;size?:"sm"|"md"}){
   const s=(f||"").toUpperCase().replace(/[^WDL]/g,"").slice(0,5);if(!s)return null;
   const txt=[...s].map(c=>t(lang,("viz."+c) as "viz.W")).join(" ");

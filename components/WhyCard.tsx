@@ -22,7 +22,7 @@ export default async function WhyCard({m,sportPath,eid,lang="ar"}:{m:Match;sport
   else if(fp<50)lines.push(t(lang,"w.open",{f:fav,p:fp,d:dog}));
   else lines.push(t(lang,"w.fav",{f:fav,p:fp,n:Math.round((100-fp)/10)}));
   return(<section className="panel invite p-5">
-    <h2 className="font-display text-xl text-white mb-4 flex items-center gap-2"><i aria-hidden className="w-1.5 h-5 rounded-full bg-amber"/>{t(lang,"w.title")}</h2>
+    <h2 className="font-display text-xl text-white mb-4 flex items-center gap-2"><i aria-hidden className="w-1.5 h-5 rounded-full bg-draw"/>{t(lang,"w.title")}</h2>
     <ol className="steps flex flex-col gap-4 text-sm text-[#C9CCE0] leading-7">{lines.slice(0,4).map((t,i)=><li key={i}><b>{i+1}</b><span className="pt-0.5">{t}</span></li>)}</ol>
     <p className="text-xs text-mute mt-3">{t(lang,"w.note")}</p>
   </section>);

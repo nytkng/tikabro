@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@theme{--color-bg:#0B0D14;--color-surface:#141824;--color-line:#1E2436;--color-ink:#E8EAF2;--color-mute:#9AA1B5;--color-violet:#8B7CFF;--color-amber:#FFB020;--color-pink:#E879A6;--color-teal:#5EC8B8;--font-sans:"Readex Pro",system-ui,sans-serif;--font-display:"Lalezar","Readex Pro",sans-serif;--color-card:#10141F;--color-hover:#171C2B}
-body{background:radial-gradient(900px 420px at 85% -8%,#1B1840 0%,rgba(11,13,20,0) 70%),#0B0D14;color:#E8EAF2;font-family:var(--font-sans);margin:0}
+@theme{--color-bg:#0B0E13;--color-s1:#0B0E13;--color-s2:#11151C;--color-s3:#171C25;--color-stroke:#232A36;--color-win:#2FBF71;--color-draw:#8B93A1;--color-loss:#E5484D;--color-surface:#141824;--color-line:#232A36;--color-ink:#E8EAF2;--color-mute:#9AA1B5;--color-violet:#8B7CFF;--color-amber:#FFB020;--color-pink:#E879A6;--color-teal:#5EC8B8;--font-sans:"IBM Plex Sans Arabic",system-ui,sans-serif;--font-display:"Lalezar","IBM Plex Sans Arabic",sans-serif;--color-card:#11151C;--color-hover:#171C25}
+body{background:radial-gradient(900px 420px at 85% -8%,#1B1840 0%,rgba(11,13,20,0) 70%),#0B0E13;color:#E8EAF2;font-family:var(--font-sans);font-variant-numeric:tabular-nums;margin:0}
 a{color:inherit;text-decoration:none}
 button,a.btn{min-height:44px}
 :focus-visible{outline:2px solid #8B7CFF;outline-offset:2px}
@@ -18,7 +18,7 @@ html,body{overflow-x:hidden}
 .scroll-x{scrollbar-width:none}.scroll-x::-webkit-scrollbar{display:none}
 
 /* ===== هدف: ملعب الليل ===== */
-:root{--surface-1:#0F1320;--surface-2:#131828;--edge:rgba(255,255,255,.06);--glow-amber:rgba(255,176,32,.28)}
+:root{--surface-1:#11151C;--surface-2:#171C25;--edge:#232A36;--glow-amber:rgba(255,176,32,.28)}
 body{background:radial-gradient(1100px 520px at 80% -10%,#1A1838 0%,rgba(11,13,20,0) 65%),radial-gradient(700px 400px at 0% 0%,rgba(94,200,184,.06),transparent 70%),#0B0D14}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .hdr{background:linear-gradient(180deg,rgba(11,13,20,.96),rgba(11,13,20,.86));backdrop-filter:blur(14px) saturate(1.3);border-bottom:1px solid var(--edge);box-shadow:0 8px 24px -16px rgba(0,0,0,.8)}
@@ -30,10 +30,10 @@ body{background:radial-gradient(1100px 520px at 80% -10%,#1A1838 0%,rgba(11,13,2
 .sport-pill{flex-shrink:0;display:inline-flex;align-items:center;gap:.5rem;height:44px;padding:0 1rem;border-radius:14px;font-size:14px;color:#C9CCE0;background:rgba(255,255,255,.025);border:1px solid var(--edge);transition:background .15s,color .15s}
 .sport-pill:hover{color:#fff;background:rgba(255,255,255,.06)}
 .sport-pill .cnt{font-size:11px;color:var(--color-mute);background:rgba(255,255,255,.05);border-radius:999px;padding:1px 7px}
-.sport-pill.on{color:#1A1206;background:linear-gradient(180deg,#FFC14D,#FFB020);border-color:transparent;font-weight:600;box-shadow:0 6px 20px -8px var(--glow-amber)}
+.sport-pill.on{color:#0B0E13;background:#E8EAF2;border-color:#E8EAF2;font-weight:600}
 .sport-pill.on .cnt{color:#1A1206;background:rgba(0,0,0,.12)}
 .side-link{display:flex;align-items:center;gap:.625rem;padding:0 .75rem;height:40px;border-radius:10px;font-size:13px;color:#C9CCE0}
-.side-link:hover{background:var(--color-hover);color:#fff}.side-link.on{background:var(--color-hover);color:#fff;font-weight:600;box-shadow:inset -3px 0 0 #FFB020}
+.side-link:hover{background:var(--color-hover);color:#fff}.side-link.on{background:var(--color-hover);color:#fff;font-weight:600;box-shadow:inset -3px 0 0 #8B7CFF}
 .chip{flex-shrink:0;display:inline-flex;align-items:center;gap:.5rem;height:40px;padding:0 .875rem;border-radius:999px;font-size:13px;color:#C9CCE0;border:1px solid var(--edge);background:rgba(255,255,255,.02)}
 .chip.on{background:#fff;color:#0B0D14;border-color:#fff}.chip.on-pink{border-color:var(--color-pink)}
 .day-tab{flex:1;min-width:72px;text-align:center;border-radius:12px;padding:.45rem 0;font-size:14px;line-height:1.25rem;color:#C9CCE0}
@@ -47,14 +47,14 @@ body{background:radial-gradient(1100px 520px at 80% -10%,#1A1838 0%,rgba(11,13,2
 .cta{color:#1A1206;background:linear-gradient(180deg,#FFC857,#FFA90F);box-shadow:0 10px 28px -10px var(--glow-amber),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .12s,filter .12s}
 .cta:hover{filter:brightness(1.06)}.cta:active{transform:scale(.97)}
 /* شريط المباشر */
-.tick-card{background:linear-gradient(180deg,#1A1424,#120F1C);border:1px solid rgba(232,121,166,.22);transition:border-color .15s}
+.tick-card{background:#11151C;border:1px solid #232A36;transition:border-color .15s}
 .tick-card:hover{border-color:rgba(232,121,166,.5)}
 /* الفلتر */
 .seg{display:flex;gap:4px;padding:4px;border-radius:14px;background:var(--surface-1);border:1px solid var(--edge);border-inline:1px solid var(--edge);margin-inline:0;min-width:0}
 .seg label{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;border-radius:10px;font-size:13px;color:#C9CCE0;cursor:pointer}
 .seg label span{font-size:11px;color:var(--color-mute)}
 .seg label:hover{background:var(--color-hover)}
-.seg input:checked+label{background:var(--surface-2);color:#fff;font-weight:600;box-shadow:inset 0 0 0 1px rgba(255,176,32,.45)}
+.seg input:checked+label{background:var(--surface-2);color:#fff;font-weight:600;box-shadow:inset 0 0 0 1px #3A4352}
 .seg input:focus-visible+label{outline:2px solid #8B7CFF;outline-offset:1px}
 .empty-note{display:none}
 .flt:has(#f-live:checked) .mrow:not([data-st=live]),.flt:has(#f-pre:checked) .mrow:not([data-st=pre]),.flt:has(#f-post:checked) .mrow:not([data-st=post]){display:none}
@@ -73,17 +73,23 @@ details:not([open]) .chev::before{transform:rotate(45deg)}
 .mrow:hover{background:rgba(255,255,255,.035)}.mrow:active{background:rgba(255,255,255,.06)}
 .mrow[data-st=live]{background:linear-gradient(270deg,rgba(232,121,166,.07),transparent 40%)}
 .score-cell{min-width:26px;text-align:center;font-size:16px;font-weight:700;border-radius:6px;background:rgba(255,255,255,.04);padding:0 4px;line-height:24px}
-.ai-tick{width:6px;height:6px;border-radius:999px;background:#FFB020;box-shadow:0 0 0 3px rgba(255,176,32,.15);flex-shrink:0}
+.ai-tick{width:6px;height:6px;border-radius:999px;background:#8B7CFF;box-shadow:0 0 0 3px rgba(139,124,255,.18);flex-shrink:0}
 .ai-chip{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:999px;font-size:11px;color:#E8EAF2;background:rgba(139,124,255,.12);border:1px solid rgba(139,124,255,.3)}
-.ai-chip.hit{background:rgba(94,200,184,.12);border-color:rgba(94,200,184,.45);color:#9FE5DA}
-.ai-chip.miss{background:rgba(255,255,255,.03);border-color:var(--edge);color:var(--color-mute);text-decoration:line-through}
+.ai-chip.hit{background:rgba(47,191,113,.12);border-color:rgba(47,191,113,.45);color:#7FE0AA}
+.ai-chip.miss{background:rgba(229,72,77,.08);border-color:rgba(229,72,77,.35);color:#F08A8D;text-decoration:line-through}
 /* الترتيب والخطوات */
 .medal{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;font-size:12px;font-weight:700;color:#0B0D14;background:radial-gradient(circle at 35% 30%,#fff8,transparent 55%),var(--m);box-shadow:inset 0 0 0 2px rgba(0,0,0,.18)}
 .steps{counter-reset:s;position:relative}
 .steps li{position:relative;display:flex;gap:12px;align-items:flex-start}
-.steps li b{flex-shrink:0;width:26px;height:26px;border-radius:999px;display:grid;place-items:center;font-size:12px;color:#FFB020;box-shadow:inset 0 0 0 1.5px #FFB020;background:#0B0D14;position:relative;z-index:1}
+.steps li b{flex-shrink:0;width:26px;height:26px;border-radius:999px;display:grid;place-items:center;font-size:12px;color:#C9CCE0;box-shadow:inset 0 0 0 1.5px #3A4352;background:#0B0E13;position:relative;z-index:1}
 .steps li:not(:last-child)::after{content:"";position:absolute;inset-inline-start:12.5px;top:26px;bottom:-16px;width:1px;background:repeating-linear-gradient(180deg,rgba(255,176,32,.5) 0 3px,transparent 3px 6px)}
 .invite{background:radial-gradient(90% 90% at 100% 0%,rgba(255,176,32,.14),transparent 60%),linear-gradient(180deg,var(--surface-2),var(--surface-1))}
 .invite:hover{border-color:rgba(255,176,32,.35)}
 .gauge-needle{transition:transform .9s cubic-bezier(.2,.9,.3,1)}
 fieldset{min-inline-size:0}
+
+/* d2: club stripe, honesty line, mini trend */
+.mrow.club{border-inline-start:3px solid var(--club)}
+.mrow .honest{display:none}
+.mrow:hover .honest,.mrow:focus-within .honest{display:inline}
+@media (hover:none){.mrow .honest{display:inline}}

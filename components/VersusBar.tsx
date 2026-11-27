@@ -7,7 +7,7 @@ export default function VersusBar({v,lang="ar"}:{v:Versus;lang?:Lang}){
   const ang=(share-.5)*160; // درجات من الوسط
   const lead=t(lang,v.humans===v.ai?"vs.tie":v.humans>v.ai?"vs.humans":"vs.machine");
   return(<section className="panel p-5" aria-labelledby="vs-h">
-    <div className="flex items-baseline justify-between gap-3"><h2 id="vs-h" className="text-[15px] font-semibold text-white">{t(lang,"vs.title")}</h2><span className="text-xs text-amber">{lead}</span></div>
+    <div className="flex items-baseline justify-between gap-3"><h2 id="vs-h" className="text-[15px] font-semibold text-white">{t(lang,"vs.title")}</h2><span className="text-xs text-mute">{lead}</span></div>
     <div className="relative mx-auto mt-3 w-[220px] h-[116px]" role="img" aria-label={t(lang,"vs.aria",{h:v.humans,a:v.ai})}>
       <svg viewBox="0 0 220 116" className="absolute inset-0 w-full h-full" aria-hidden>
         <path d="M14 110 A96 96 0 0 1 206 110" fill="none" stroke="#1E2436" strokeWidth="14" strokeLinecap="round"/>

@@ -33,6 +33,15 @@ export async function goalsMap(path:string):Promise<{map:Map<string,TeamGoals>;a
     return map.size>=4&&gp>0?{map,avg:gf/gp}:null;
   }catch{return null}
 }
+// ترتيب الفرق من جدول ESPN (team id → المرتبة)
+export async function rankMap(path:string):Promise<Map<string,number>|null>{
+  try{
+    const r=await fetch(`https://site.api.espn.com/apis/v2/sports/${path}/standings`,{next:{revalidate:21600}} as any);
+    if(!r.ok)return null;const j:any=await r.json();const map=new Map<string,number>();let groups=0;
+    const walk=(n:any)=>{if(!n)return;const en:any[]=n.standings?.entries;if(en?.length){groups++;en.forEach((e:any,i:number)=>{const v=Number((e.stats||[]).find((s:any)=>s.name==="rank")?.value);if(e.team?.id)map.set(String(e.team.id),isFinite(v)&&v>0?v:i+1)})}(n.children||[]).forEach(walk)};
+    walk(j);return groups===1&&map.size>=4?map:null;
+  }catch{return null}
+}
 export async function fetchDay(date:string):Promise<Match[]>{
   const ymd=date.replace(/-/g,"");
   const out:Match[]=[];

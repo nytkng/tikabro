@@ -21,7 +21,7 @@ export default function CrowdVsAI({home,away,hasDraw,counts,ai,mine,revealed,out
     :<>
       <p className="text-sm text-mute mb-4"><b className="text-white tabular-nums">{n}</b> {t(lang,"c.players")}{outcome?t(lang,"c.out"):""}.</p>
       <dl className="grid grid-cols-3 gap-2.5 items-end">
-        {col(t(lang,"c.ai"),ai,"border-amber/50 bg-amber/[.06]",true)}
+        {col(t(lang,"c.ai"),ai,"border-violet/50 bg-violet/[.06]",true)}
         {col(t(lang,"c.crowd"),top,"border-pink/40 bg-pink/[.05]")}
         {col(t(lang,"c.you"),mine,"border-violet/45 bg-violet/[.06]")}
       </dl>

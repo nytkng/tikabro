@@ -7,7 +7,7 @@ export default function ShareCard({nick,home,away,mine,ai,aiPct,kickoff,url,lang
   async function draw():Promise<Blob>{
     await document.fonts.ready;
     const W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d")!;
-    const F="'Readex Pro', system-ui, sans-serif";
+    const F="'IBM Plex Sans Arabic', system-ui, sans-serif";
     const bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#151833");bg.addColorStop(1,"#0B0D17");g.fillStyle=bg;g.fillRect(0,0,W,H);
     const rtl=lang==="ar",S:"right"|"left"=rtl?"right":"left",X=rtl?W-80:80,XB=rtl?W-130:130,brand=t(lang,"brand");
     g.direction=rtl?"rtl":"ltr";g.textAlign=S;

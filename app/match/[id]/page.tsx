@@ -1,6 +1,6 @@
 import {getDay} from "@/lib/day";
 import {matchFromDB,teamIds} from "@/lib/feed";
-import {goalsMap} from "@/lib/espn";
+import {goalsMap,rankMap} from "@/lib/espn";
 import {predictDCFull} from "@/lib/model";
 import {dbGoals} from "@/lib/goals";
 import LiveRefresh from "@/components/LiveRefresh";
@@ -77,9 +77,17 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
   const aiPct=pp&&pk2?pp[pk2]:0;
   const sp=key.split("-")[0];const ids=m.sample?null:await teamIds(eid0).catch(()=>null);
   const [hist,viz]=await Promise.all([pk2&&!m.sample?probHistory(`${sp}:${eid0}`,pk2):null,ids&&(tab==="stats"||tab==="h2h")?teamViz(sp,ids,m,lang):null]);
+  // الفورمة ضد الترتيب: فريق تحت في الجدول ربح ≥2 أكثر في آخر 5
+  const wins=(f?:string|null)=>{const x=(f||"").toUpperCase().replace(/[^WDL]/g,"").slice(0,5);return x.length>=5?[...x].filter(c=>c==="W").length:null};
+  const wh=wins(m.homeForm),wa=wins(m.awayForm);
+  let diverge:string|null=null;
+  if(wh!=null&&wa!=null&&Math.abs(wh-wa)>=2&&ids&&m.slug&&m.slug!=="all"&&m.sport==="football"&&!post){
+    const rk=await rankMap("soccer/"+m.slug).catch(()=>null);const rh=rk?.get(String(ids.h)),ra=rk?.get(String(ids.a));
+    if(rh&&ra&&rh!==ra){const low=rh>ra?0:1,lw=low?wa:wh,hw=low?wh:wa;
+      if(lw-hw>=2)diverge=t(lang,"d2.diverge_txt",{t:low?m.away:m.home,r:low?ra:rh,w:lw,o:low?m.home:m.away,ow:hw})}}
   const tabHref=(x:Tab)=>`/match/${encodeURIComponent(key)}${x==="pred"?"":"?tab="+x}#tabs`;
   const side=(i:0|1)=>{const n=i?m.away:m.home,l=i?m.awayLogo:m.homeLogo;return(<div className="flex flex-col items-center gap-2.5 min-w-0 text-center">
-    <span className={"rounded-full p-1 "+(win(i)?"ring-2 ring-amber/70 shadow-[0_0_30px_-6px_var(--glow-amber)]":"")}><Crest name={n} size={72} logo={l}/></span>
+    <span className={"rounded-full p-1 "+(win(i)?"ring-2 ring-win/70":"")}><Crest name={n} size={72} logo={l}/></span>
     {(()=>{const tid=i?ids?.a:ids?.h,cl="text-[15px] sm:text-lg font-semibold leading-6 line-clamp-2 "+(post&&!win(i)?"text-mute":"text-white");return tid?<a href={`/team/${sp}/${tid}`} className={cl+" hover:underline"}><bdi>{n}</bdi></a>:<span className={cl}><bdi>{n}</bdi></span>})()}
     <span className="text-[11px] text-mute">{t(lang,i?"away_side":"home_side")}</span>{!post&&<FormBoxes f={i?m.awayForm:m.homeForm} lang={lang} size="md"/>}</div>)};
   const H2=({c,children}:{c:string;children:React.ReactNode})=><h2 className="font-display text-xl text-white mb-1 flex items-center gap-2"><i aria-hidden className={"w-1.5 h-5 rounded-full "+c}/>{children}</h2>;
@@ -92,7 +100,7 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
      <bdi className="truncate flex-1 text-white text-end">{m.away}</bdi><Crest name={m.away} size={22} logo={m.awayLogo}/></div></StickyScore>
    <div className="flex flex-wrap items-center justify-between gap-2">
     <a href={m.slug&&m.slug!=="all"?`/league/${key.split("-")[0]}/${m.slug}`:"/"} className="chip hover:text-white">{m.leagueLogo?<img src={m.leagueLogo} alt="" width={18} height={18} referrerPolicy="no-referrer" className="w-[18px] h-[18px] object-contain"/>:null}<bdi className="truncate max-w-[190px]">{leagueOf(m,lang)}</bdi></a>
-    {!m.sample&&<a href={`/live/${encodeURIComponent(key)}`} className="chip !border-amber/50 !text-amber hover:bg-amber/10">{t(lang,"m.live_mode")}</a>}
+    {!m.sample&&<a href={`/live/${encodeURIComponent(key)}`} className="chip hover:text-white hover:bg-hover">{t(lang,"m.live_mode")}</a>}
    </div>
    <section id="stage" className="stage relative overflow-hidden rounded-[22px] px-4 pt-6 pb-5 sm:p-8">
     <div className="relative grid grid-cols-[1fr_auto_1fr] items-start gap-3">
@@ -104,11 +112,12 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
       </div>
       {live?<span className="inline-flex items-center gap-2 text-pink text-sm font-semibold"><i className="live-dot !mb-0"/>{m.clock&&m.clock!=="0'"?<bdi dir="ltr">{m.clock}</bdi>:t(lang,"live")}</span>
       :post?<span className="text-xs text-mute rounded-full bg-white/5 px-3 py-1">{t(lang,"final")}</span>
-      :<><span className="text-[11px] text-mute text-center">{kd}</span><Countdown lang={lang} to={m.kickoff} className="text-amber text-sm font-semibold tabular-nums"/></>}
+      :<><span className="text-[11px] text-mute text-center">{kd}</span><Countdown lang={lang} to={m.kickoff} className="text-white text-sm font-semibold tabular-nums"/></>}
      </div>
      {side(1)}
     </div>
    </section>
+   {diverge&&<div role="note" className="flex flex-wrap items-center gap-2.5 rounded-xl border border-line bg-s2 px-3 py-2.5 text-[13px] leading-6"><span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-loss/10 text-[#F08A8D] border border-loss/30 px-2.5 h-7 text-xs font-semibold">⚠️ {t(lang,"d2.diverge")}</span><span className="text-[#C9CCE0] min-w-0">{diverge}</span></div>}
    <nav id="tabs" aria-label={t(lang,"viz.tabs")} className="p-1 bg-card grid grid-cols-4 gap-1 rounded-xl border border-line">
     {TABS.map(x=><a key={x} href={tabHref(x)} aria-current={tab===x?"page":undefined} className={"min-h-[44px] grid place-items-center rounded-lg text-[13px] font-semibold "+(tab===x?"bg-white !text-[#0B0D14]":"text-mute hover:text-white hover:bg-hover")}>{t(lang,("viz.tab_"+x) as Key)}</a>)}
    </nav>
@@ -125,7 +134,7 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
      {sealed&&<details className="mt-4 text-xs text-mute"><summary className="cursor-pointer min-h-[44px] flex items-center">{t(lang,"m.proof")}</summary>
        <p className="mt-1 leading-6">{t(lang,"m.sealed_at")} <bdi dir="ltr">{new Date(sealRow!.created_at).toLocaleString(locOf(lang),{timeZone:"Africa/Algiers"})}</bdi>{t(lang,"m.proof_txt")}</p>
        <code dir="ltr" className="block mt-2 break-all rounded-lg bg-bg border border-line p-2 text-[#C9CCE0]">{sealText}</code>
-       <code dir="ltr" className="block mt-2 break-all rounded-lg bg-bg border border-amber/40 p-2 text-amber">{sealHash}</code></details>}
+       <code dir="ltr" className="block mt-2 break-all rounded-lg bg-bg border border-line p-2 text-[#C9CCE0]">{sealHash}</code></details>}
      </section>
    :<section className="panel p-5 text-mute text-sm leading-7">{t(lang,"m.no_pred")}</section>}
    <section className="panel p-5 sm:p-6"><H2 c="bg-violet">{t(lang,"m.your_pick")}</H2>
@@ -136,7 +145,7 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
     :<><p className="text-sm text-mute mb-4">{t(lang,"m.login_to")}</p><a href="/login" className="btn cta inline-flex items-center px-6 rounded-xl font-semibold">{t(lang,"m.login_cta")}</a></>}
    </section>
    {!m.sample&&<CrowdVsAI lang={lang} home={m.home} away={m.away} hasDraw={hasDraw} counts={counts} ai={aiK} mine={mine} revealed={!!mine||!open} outcome={outcome}/>}
-   {!m.sample&&<WhyCard lang={lang} m={m} sportPath={key.split("-")[0]} eid={eid}/>}
+   {!m.sample&&<div id="why" className="scroll-mt-20"><WhyCard lang={lang} m={m} sportPath={key.split("-")[0]} eid={eid}/></div>}
    {m.ext&&<Markets lang={lang} x={m.ext} home={m.home} away={m.away}/>}
    </>}
    {tab==="stats"&&<>
@@ -144,7 +153,7 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
      <div className="flex justify-center gap-4 text-xs my-2"><span className="text-violet">● <bdi>{m.home}</bdi></span><span className="text-pink">● <bdi>{m.away}</bdi></span></div>
      <Radar axes={viz.axes} home={m.home} away={m.away} lang={lang}/>
      <p className="text-[11px] text-mute mt-2 leading-5">{t(lang,"viz.radar_note")}</p></section>}
-    {viz&&viz.rows.length>0&&<section className="panel p-5 sm:p-6"><H2 c="bg-amber">{t(lang,"viz.pctl")}</H2><div className="mt-3"><PercentileBars rows={viz.rows} home={m.home} away={m.away} lang={lang}/></div></section>}
+    {viz&&viz.rows.length>0&&<section className="panel p-5 sm:p-6"><H2 c="bg-draw">{t(lang,"viz.pctl")}</H2><div className="mt-3"><PercentileBars rows={viz.rows} home={m.home} away={m.away} lang={lang}/></div></section>}
     {!m.sample&&<MatchCentre lang={lang} id={key} part="stats"/>}
    </>}
    {tab==="h2h"&&<>

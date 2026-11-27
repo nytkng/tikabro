@@ -671,6 +671,15 @@ const D={
  "api.match_check":{ar:"تعذّر التحقق من المباراة، حاول بعد قليل.",fr:"Impossible de vérifier le match, réessayez dans un instant.",en:"Couldn't verify the match, try again shortly."},
  "api.started":{ar:"المباراة بدأت، التوقعات مقفولة.",fr:"Le match a commencé, les pronostics sont fermés.",en:"The match has started, predictions are closed."},
  "api.seal_fail":{ar:"تعذّر ختم التوقع الآن.",fr:"Impossible de sceller le pronostic pour le moment.",en:"Couldn't seal the prediction right now."},
+ "d2.honest":{ar:"{p}% = تقريبا {n} من 10 كيما هذي تصيب",fr:"{p}% ≈ {n} sur 10 comme celui-ci se réalisent",en:"{p}% ≈ {n} in 10 like this come true"},
+ "d2.why":{ar:"علاش هاد التوقع؟",fr:"Pourquoi ce pronostic ?",en:"Why this pick?"},
+ "d2.trend":{ar:"تطور احتمال الـ AI",fr:"Évolution de la probabilité IA",en:"AI probability trend"},
+ "d2.diverge":{ar:"الفورمة تكذّب الترتيب",fr:"La forme contredit le classement",en:"Form contradicts the table"},
+ "d2.diverge_txt":{ar:"{t} (المرتبة {r}) ربح {w} من آخر 5، أكثر من {o} اللي فوقو في الترتيب ({ow}).",fr:"{t} ({r}e) a gagné {w} des 5 derniers, plus que {o} mieux classé ({ow}).",en:"{t} (#{r}) won {w} of the last 5, more than higher-ranked {o} ({ow})."},
+ "d2.empty_t":{ar:"ما كاش ماتشات هنا",fr:"Aucun match ici",en:"No matches here"},
+ "d2.empty_next":{ar:"شوف {x}",fr:"Voir {x}",en:"See {x}"},
+ "d2.empty_live":{ar:"ما كاش ماتشات مباشرة دركا.",fr:"Aucun match en direct.",en:"Nothing live right now."},
+ "d2.all":{ar:"كل الماتشات",fr:"Tous les matchs",en:"All matches"},
 } satisfies Record<string,E>;
 export type Key=keyof typeof D;
 export function t(l:Lang,k:Key,v?:Record<string,string|number>):string{

@@ -10,6 +10,6 @@ export default function LangSwitch({lang,label}:{lang:Lang;label:string}){
     location.reload()}
   return(<div role="group" aria-label={label} className="flex items-center gap-0.5 rounded-full bg-white/[0.03] border border-white/10 p-0.5 shrink-0">
     {L.map(([k,t])=><button key={k} type="button" lang={k} onClick={()=>go(k)} aria-pressed={k===lang} disabled={busy}
-      className={"h-7 min-w-7 px-1.5 rounded-full text-[11px] font-semibold "+(k===lang?"bg-amber text-[#1A1206]":"text-[#BCC1D6] hover:text-white")}>{t}</button>)}
+      className={"h-7 min-w-7 px-1.5 rounded-full text-[11px] font-semibold "+(k===lang?"bg-white text-[#0B0E13]":"text-[#BCC1D6] hover:text-white")}>{t}</button>)}
   </div>);
 }
