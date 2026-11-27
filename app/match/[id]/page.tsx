@@ -20,6 +20,15 @@ import ProbRing from "@/components/ui/ProbRing";
 import Seal from "@/components/ui/Seal";
 import Countdown from "@/components/ui/Countdown";
 import StickyScore from "./StickyScore";
+import JsonLd from "@/components/JsonLd";
+import {matchMeta,sportsEventLd,SITE_URL} from "@/lib/seo";
+import type {Metadata} from "next";
+export async function generateMetadata({params}:{params:Promise<{id:string}>}):Promise<Metadata>{
+  const key=decodeURIComponent((await params).id);const eid=key.split(":")[1]||"";
+  const m=/^\d{3,12}$/.test(eid)?await matchFromDB(eid).catch(()=>null):null;
+  if(!m)return {metadataBase:new URL(SITE_URL),title:{absolute:"توقع مباراة | هدف"},robots:{index:false}};
+  return {metadataBase:new URL(SITE_URL),...matchMeta(m)};
+}
 export default async function MatchPage({params}:{params:Promise<{id:string}>}){
   const {id}=await params;const key=decodeURIComponent(id);
   const date=new Date().toLocaleDateString("en-CA",{timeZone:"Africa/Algiers"});
@@ -62,6 +71,7 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
     <span className="text-[11px] text-mute">{i?"الضيف":"صاحب الأرض"}</span></div>)};
   const H2=({c,children}:{c:string;children:React.ReactNode})=><h2 className="font-display text-xl text-white mb-1 flex items-center gap-2"><i aria-hidden className={"w-1.5 h-5 rounded-full "+c}/>{children}</h2>;
   return(<div className="flex flex-col gap-5 pb-6">
+    <JsonLd data={sportsEventLd(m)}/>
    <LiveRefresh on={live} every={45}/>
    <StickyScore><div className="flex items-center gap-2 px-3 h-12 text-[13px]">
      <Crest name={m.home} size={22} logo={m.homeLogo}/><bdi className="truncate flex-1 text-white">{m.home}</bdi>

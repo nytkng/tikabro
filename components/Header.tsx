@@ -1,7 +1,7 @@
 import {Suspense} from "react";
 import {currentPlayer} from "@/lib/auth";
 import LivePill from "@/components/ui/LivePill";
-const nav=[["المباريات","/"],["الترتيب","/leaders"],["دوريات الأصحاب","/groups"],["سجل الـ AI","/ai"],["تصنيف الفرق","/rankings"],["الباقات","/pricing"]];
+const nav=[["المباريات","/"],["رادار","/insights"],["الترتيب","/leaders"],["دوريات الأصحاب","/groups"],["سجل الـ AI","/ai"],["تصنيف الفرق","/rankings"],["الباقات","/pricing"]];
 export default async function Header(){
   const me=await currentPlayer();
   return(<header className="hdr sticky top-0 z-30">

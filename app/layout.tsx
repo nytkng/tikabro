@@ -3,7 +3,7 @@ import "@fontsource/readex-pro/400.css";import "@fontsource/readex-pro/600.css";
 import "./globals.css";
 import Header from "@/components/Header";
 import InstallPrompt from "@/components/InstallPrompt";
-export const metadata:Metadata={title:{default:"هدف — الأرينا",template:"%s · هدف"},description:"توقعات رياضية مختومة وشفافة. تحدّى الـ AI وأثبت أنك متوقع حقيقي. للتوقعات فقط، بلا مراهنة.",metadataBase:new URL(process.env.SITE_URL||"https://hadaf.example")};
+export const metadata:Metadata={title:{default:"هدف — الأرينا",template:"%s · هدف"},description:"توقعات رياضية مختومة وشفافة. تحدّى الـ AI وأثبت أنك متوقع حقيقي. للتوقعات فقط، بلا مراهنة.",metadataBase:new URL(process.env.SITE_URL||"https://tikabro.thenytkng.workers.dev")};
 export const viewport:Viewport={themeColor:"#0B0D14",width:"device-width",initialScale:1};
 export default function Root({children}:{children:React.ReactNode}){
   return(<html lang="ar" dir="rtl"><body><Header/><main className="mx-auto max-w-[1320px] px-3 sm:px-6 py-5 pb-20">{children}</main>

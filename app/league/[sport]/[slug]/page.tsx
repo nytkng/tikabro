@@ -3,6 +3,11 @@ import {db} from "@/lib/db";
 import {COLS,toMatch,type Row} from "@/lib/feed";
 import MatchRow from "@/components/MatchRow";
 export const dynamic="force-dynamic";
+import {leagueMeta,SITE_URL} from "@/lib/seo";
+import type {Metadata} from "next";
+export async function generateMetadata({params}:{params:Promise<{sport:string;slug:string}>}):Promise<Metadata>{
+  const {sport,slug}=await params;return {metadataBase:new URL(SITE_URL),...leagueMeta(sport,slug)};
+}
 
 const SPORTS=["soccer","basketball","hockey","football","baseball"];
 type Stat={name?:string;displayValue?:string;value?:number};
