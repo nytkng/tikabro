@@ -17,7 +17,10 @@ export type Player={id:string;nick:string;hue:number|null;bio:string|null};
 export async function verifyCookie(v?:string):Promise<string|null>{
   if(!v)return null;const i=v.lastIndexOf(".");if(i<1)return null;
   const id=v.slice(0,i),sig=v.slice(i+1);
-  return sig===await hmac(id)&&/^[0-9a-f-]{36}$/.test(id)?id:null;
+  if(!/^[0-9a-f-]{36}$/.test(id))return null;
+  const want=await hmac(id);if(sig.length!==want.length)return null;
+  let d=0;for(let j=0;j<want.length;j++)d|=sig.charCodeAt(j)^want.charCodeAt(j); // مقارنة بوقت ثابت
+  return d===0?id:null;
 }
 export async function currentPlayer():Promise<Player|null>{
   try{
