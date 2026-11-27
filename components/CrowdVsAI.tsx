@@ -6,7 +6,7 @@ export default function CrowdVsAI({home,away,hasDraw,counts,ai,mine,revealed,out
   const top:K|null=n?(["home","draw","away"] as K[]).reduce((a,b)=>counts[b]>counts[a]?b:a,"home"):null;
   const name=(k:K|null)=>k==="home"?`فوز ${home}`:k==="away"?`فوز ${away}`:k==="draw"?"تعادل":"—";
   const mark=(k:K|null)=>outcome&&k?(k===outcome?" ✓":" ✗"):"";
-  return(<section className="rounded-[20px] bg-surface border border-line p-7">
+  return(<section className="rounded-2xl bg-card border border-line p-7">
     <h2 className="text-lg font-semibold text-white mb-1">الجمهور ضد الـ AI</h2>
     {!revealed?<p className="text-sm text-mute">{n?`${n} لاعب ختمو توقعاتهم. `:""}رأي الجمهور يتخبى حتى تختم توقعك، باش يبقى قرارك نتاعك.</p>
     :n===0?<p className="text-sm text-mute">ماكانش توقعات من الجمهور في هذي المباراة.</p>

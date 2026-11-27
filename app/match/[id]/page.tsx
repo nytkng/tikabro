@@ -46,12 +46,12 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
   return(<div className="flex flex-col gap-6">
    <LiveRefresh on={m.state==="live"} every={45}/>
    <a href="/" className="text-sm text-mute hover:text-white flex items-center gap-2">{m.leagueLogo?<img src={m.leagueLogo} alt="" width={18} height={18} referrerPolicy="no-referrer" className="w-[18px] h-[18px] object-contain"/>:null}{m.league} · رجوع للمباريات</a>
-   <section className="rounded-[20px] bg-surface border border-line p-7 flex flex-wrap items-center justify-between gap-6">
+   <section className="rounded-2xl bg-card border border-line p-7 flex flex-wrap items-center justify-between gap-6">
     <div className="flex items-center gap-4"><Crest name={m.home} size={64} logo={m.homeLogo}/><span className="text-2xl font-bold text-white">{m.home}</span></div>
     <div className="text-center"><div className="text-4xl font-bold text-white tabular-nums">{m.score?`${m.score[0]} - ${m.score[1]}`:new Date(m.kickoff).toLocaleTimeString("ar-DZ",{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Algiers"})}</div>
      <div className={"text-sm mt-1 "+(m.state==="live"?"text-pink font-semibold":"text-mute")}>{m.state==="live"?(m.clock||"مباشر"):m.state==="post"?"انتهت":new Date(m.kickoff).toLocaleDateString("ar-DZ",{weekday:"long",day:"numeric",month:"long",timeZone:"Africa/Algiers"})}</div></div>
     <div className="flex items-center gap-4"><span className="text-2xl font-bold text-white">{m.away}</span><Crest name={m.away} size={64} logo={m.awayLogo}/></div></section>
-   {pp?<section className="rounded-[20px] bg-surface border border-line p-7 flex flex-wrap items-center gap-6">
+   {pp?<section className="rounded-2xl bg-card border border-line p-7 flex flex-wrap items-center gap-6">
      <div className={"seal w-[120px] h-[120px] rounded-full border-[3px] flex items-center justify-center flex-none "+(sealed?"border-amber bg-[#2A2110]":"border-line bg-bg opacity-80")}><div className="w-[100px] h-[100px] rounded-full border border-dashed border-amber flex flex-col items-center justify-center text-amber"><b className="text-xl">{sealed?"مختوم":"مباشر"}</b><span className="text-[11px]">{sealed?"قبل البداية":"لم يُختم بعد"}</span></div></div>
      <div className="flex-1 min-w-[240px]"><div className="text-sm text-mute">{sealed?"توقع الـ AI المختوم":"تقدير الـ AI الآن (يُختم قبل البداية)"}</div><div className="text-3xl font-bold text-white my-1">{pk2==="h"?`فوز ${m.home}`:pk2==="a"?`فوز ${m.away}`:"تعادل"}</div>
       <div className="flex h-3 rounded-full overflow-hidden gap-[3px] mt-3"><i style={{width:pp!.h+"%"}} className="bg-violet"/>{pp!.d>0&&<i style={{width:pp!.d+"%"}} className="bg-[#4A5273]"/>}<i style={{width:pp!.a+"%"}} className="bg-pink"/></div>
@@ -61,8 +61,8 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
        <code dir="ltr" className="block mt-2 break-all rounded-lg bg-bg border border-line p-2 text-[#C9CCE0]">{sealText}</code>
        <code dir="ltr" className="block mt-2 break-all rounded-lg bg-bg border border-amber/40 p-2 text-amber">{sealHash}</code></details>}
       </div></section>
-   :<section className="rounded-[20px] bg-surface border border-line p-7 text-mute">لا توقع لهذه المباراة بعد، لأن البيانات غير كافية. لا نخمّن.</section>}
-   <section className="rounded-[20px] bg-surface border border-line p-7"><h2 className="text-lg font-semibold text-white mb-1">توقعك</h2>
+   :<section className="rounded-2xl bg-card border border-line p-7 text-mute">لا توقع لهذه المباراة بعد، لأن البيانات غير كافية. لا نخمّن.</section>}
+   <section className="rounded-2xl bg-card border border-line p-7"><h2 className="text-lg font-semibold text-white mb-1">توقعك</h2>
     {m.sample?<p className="text-sm text-mute">مباراة تجريبية، ما فيها ختم.</p>
     :!open?<p className="text-sm text-mute">{mine?`توقعك المختوم: ${mine==="home"?"فوز "+m.home:mine==="away"?"فوز "+m.away:"تعادل"}. `:""}التوقعات مقفولة لأن المباراة بدأت.</p>
     :me?<><p className="text-sm text-mute mb-4">اختر قبل البداية. يُختم باسمك <b className="text-white">{me.nick}</b> وتقدر تبدلو لحد الصافرة.</p><PickButtons matchId={key} home={m.home} away={m.away} hasDraw={m.sport==="football"} current={mine}/>

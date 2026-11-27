@@ -10,7 +10,7 @@ const Group=({title,hint,children}:{title:string;hint?:string;children:React.Rea
 export default function Markets({x,home,away}:{x:Ext;home:string;away:string}){
   const hot=(a:number,b:number)=>[a>=b&&a>=58,b>a&&b>=58];
   const [byH,byN]=hot(x.btts.yes,x.btts.no);
-  return(<section className="rounded-[20px] bg-surface border border-line p-6 sm:p-7 flex flex-col gap-7">
+  return(<section className="rounded-2xl bg-card border border-line p-6 sm:p-7 flex flex-col gap-7">
     <div><h2 className="text-lg font-semibold text-white">تنبؤات إضافية</h2>
      <p className="text-sm text-mute mt-1 leading-7">كلها من نفس النموذج. الأخضر = ما يميل له الـ AI بنسبة 58% وأكثر. <b className="text-white">نسب فقط، بلا أسعار ولا مراهنة.</b></p></div>
     <div className="rounded-xl bg-bg border border-line p-4"><div className="text-sm text-mute mb-2">لماذا هذه الأرقام؟ الأهداف المتوقعة</div>

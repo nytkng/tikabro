@@ -29,7 +29,7 @@ export default async function Profile({params}:{params:Promise<{nick:string}>}){
   const lab=(c:C)=>{const m=nm.get(c.match_id);const w=c.pick==="home"?(m?`فوز ${m.home}`:"فوز الأرض"):c.pick==="away"?(m?`فوز ${m.away}`:"فوز الضيف"):"تعادل";return w};
   const col=p.hue??260;
   return(<div className="flex flex-col gap-6">
-   <section className="rounded-[20px] bg-surface border border-line p-6 sm:p-7 flex flex-wrap items-center gap-5">
+   <section className="rounded-2xl bg-card border border-line p-6 sm:p-7 flex flex-wrap items-center gap-5">
     <div aria-hidden className="size-20 rounded-full flex items-center justify-center text-3xl font-bold text-bg flex-none" style={{background:`hsl(${col} 65% 62%)`}}>{[...p.nick][0]?.toUpperCase()}</div>
     <div className="min-w-0 flex-1"><h1 className="text-2xl font-bold text-white break-words">{p.nick}</h1>
      <div className="mt-1.5 flex items-center gap-3 flex-wrap">
@@ -41,7 +41,7 @@ export default async function Profile({params}:{params:Promise<{nick:string}>}){
      ["توقعات مُسوّاة",s.n],["نسبة الإصابة",rate===null?"—":rate+"%"],["النقاط",s.points],["أيام النشاط",s.days]].map(([t,v])=>
      <div key={String(t)} className="rounded-2xl bg-surface border border-line p-4"><div className="text-xs text-mute">{t}</div><b dir="ltr" className="block text-2xl text-white mt-1 text-start tabular-nums">{v}</b></div>)}</section>
    <p className="text-xs text-mute leading-6 -mt-2">النجوم تُحسب أوتوماتيكيا من النتائج المختومة فقط (تبدأ بعد 10 توقعات مُسوّاة). لا تُشترى ولا تُعطى بالتصويت.</p>
-   <section className="rounded-[20px] bg-surface border border-line p-6 sm:p-7"><h2 className="text-lg font-semibold text-white mb-3">آخر التوقعات</h2>
+   <section className="rounded-2xl bg-card border border-line p-6 sm:p-7"><h2 className="text-lg font-semibold text-white mb-3">آخر التوقعات</h2>
     {calls?.length?<ul>{calls.map(c=><li key={c.match_id+c.kickoff} className="flex items-center justify-between gap-3 py-3 border-t border-line first:border-0">
       <div className="min-w-0"><div className="text-white">{lab(c)}</div><div className="text-xs text-mute mt-0.5">{nm.get(c.match_id)?`${nm.get(c.match_id)!.home} ضد ${nm.get(c.match_id)!.away} · `:""}{c.league} · {new Date(c.kickoff).toLocaleDateString("ar-DZ",{day:"numeric",month:"short",timeZone:"Africa/Algiers"})}</div></div>
       <span className={"text-xs rounded-full px-3 py-1 flex-none "+(!c.settled?"border border-line text-mute":c.hit?"bg-teal/20 text-teal":"bg-pink/15 text-pink")}>{!c.settled?"مفتوح":c.hit?"أصاب":"أخطأ"}</span></li>)}</ul>

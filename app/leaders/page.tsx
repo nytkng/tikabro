@@ -15,7 +15,7 @@ export default async function Leaders({searchParams}:{searchParams:Promise<{r?:s
   const list:(Row&{ai?:boolean})[]=[...(rows||[])];
   if(a&&a.n>0)list.push({nick:"الـ AI (هدف)",n:a.n,hits:a.hits,points:a.points,ai:true});
   list.sort((x,y)=>y.points-x.points);
-  return(<section className="rounded-[20px] bg-surface border border-line p-7">
+  return(<section className="rounded-2xl bg-card border border-line p-7">
    <h1 className="text-2xl font-bold text-white mb-4">الترتيب</h1>
    <div className="flex gap-2 mb-5 text-sm"><a href="/leaders" className={`px-4 py-2.5 rounded-full ${!all?"bg-violet text-bg font-semibold":"border border-line text-mute"}`}>هذا الأسبوع</a><a href="/leaders?r=all" className={`px-4 py-2.5 rounded-full ${all?"bg-violet text-bg font-semibold":"border border-line text-mute"}`}>كل الوقت</a></div>
    {rows===null?<p className="text-mute leading-7">تعذّر الاتصال بقاعدة البيانات الآن.</p>
