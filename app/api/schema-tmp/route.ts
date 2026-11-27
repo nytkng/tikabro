@@ -14,5 +14,10 @@ export async function GET(){
       rpc[p.slice(5)]=params?Object.keys(params):[];
     }else if(p!=="/")tables.push(p.slice(1));
   }
-  return Response.json({rpc,tables});
+  const cols:Record<string,string[]>={};
+  for(const t of ["players","picks","seals","predictions","follows"]){
+    const pr=j.definitions?.[t]?.properties||{};
+    cols[t]=Object.entries<any>(pr).map(([k,v])=>k+":"+(v.format||v.type));
+  }
+  return Response.json({cols});
 }
