@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import {supaOrigin} from "@/lib/supa";
 export async function GET(){
   const raw=process.env.SUPABASE_URL;const url=supaOrigin(raw);const key=process.env.SUPABASE_SERVICE_KEY?.trim();

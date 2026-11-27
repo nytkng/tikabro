@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import {db} from "@/lib/db";
 export const revalidate=120;
 export const metadata={title:"الترتيب"};
