@@ -1,0 +1,25 @@
+# اختبار دخان: الصفحات الأساسية لازم ترجع 200 وبلا "Application error". كل 6 ساعات وبعد كل رفع.
+name: smoke
+on:
+  push: {branches: [main]}
+  schedule: [{cron: "7 */6 * * *"}]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for deploy
+        if: github.event_name == 'push'
+        run: sleep 240
+      - name: Check pages
+        run: |
+          set -e
+          B=https://tikabro.thenytkng.workers.dev
+          fail=0
+          for p in / /ai /rankings /leaders /search?q=real /insights /verify /data /learn /api/health; do
+            code=$(curl -s -o body.html -w '%{http_code}' "$B$p")
+            if [ "$code" != "200" ] || grep -q "Application error" body.html; then echo "FAIL $p -> $code"; fail=1; else echo "ok $p"; fi
+          done
+          curl -sI "$B/" | grep -qi "content-security-policy: .*nonce-" || { echo "FAIL CSP nonce missing"; fail=1; }
+          exit $fail
