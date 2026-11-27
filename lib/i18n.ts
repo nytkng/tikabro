@@ -56,6 +56,8 @@ const D={
  "sp.rugby":{ar:"الركبي",fr:"Rugby",en:"Rugby"},
  "sp.volleyball":{ar:"الكرة الطائرة",fr:"Volley-ball",en:"Volleyball"},
  "sp.aussie":{ar:"الكرة الأسترالية",fr:"Football australien",en:"Aussie rules"},
+ "sp.lacrosse":{ar:"اللاكروس",fr:"Crosse",en:"Lacrosse"},
+ "sp.fieldhockey":{ar:"هوكي الميدان",fr:"Hockey sur gazon",en:"Field hockey"},
  "sp.tennis":{ar:"التنس",fr:"Tennis",en:"Tennis"},
  "sp.golf":{ar:"الغولف",fr:"Golf",en:"Golf"},
  "sp.f1":{ar:"الفورمولا 1",fr:"Formule 1",en:"Formula 1"},
@@ -306,6 +308,14 @@ const D={
  "viz.matches":{ar:"مباريات متوقعة",fr:"Matchs pronostiqués",en:"Matches predicted"},
  "viz.hit":{ar:"نسبة الإصابة",fr:"Taux de réussite",en:"Hit rate"},
  "viz.worst":{ar:"الأضعف: {l} ({p}%)",fr:"La plus faible : {l} ({p}%)",en:"Weakest: {l} ({p}%)"},
+ "pitch.aria":{ar:"تشكيلة {h} ({hf}) ضد {a} ({af}) على أرضية الملعب",fr:"Compositions {h} ({hf}) contre {a} ({af}) sur le terrain",en:"{h} ({hf}) vs {a} ({af}) line-ups on the pitch"},
+ "pitch.subs":{ar:"البدلاء",fr:"Remplaçants",en:"Substitutes"},
+ "pitch.coach":{ar:"المدرب",fr:"Entraîneur",en:"Coach"},
+ "pitch.goal":{ar:"هدف",fr:"but",en:"goal"},
+ "pitch.yc":{ar:"إنذار",fr:"carton jaune",en:"yellow card"},
+ "pitch.rc":{ar:"طرد",fr:"carton rouge",en:"red card"},
+ "pitch.off":{ar:"خرج",fr:"remplacé",en:"subbed off"},
+ "pitch.in":{ar:"دخل",fr:"entré",en:"subbed on"},
 } satisfies Record<string,E>;
 export type Key=keyof typeof D;
 export function t(l:Lang,k:Key,v?:Record<string,string|number>):string{

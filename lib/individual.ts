@@ -1,9 +1,18 @@
 // قارئ الرياضات الفردية (جدول ind_events). للخادم فقط.
 import {db} from "@/lib/db";
 
-export type IndSport="tennis"|"golf"|"f1"|"ufc";
-export const IND_SPORTS:IndSport[]=["tennis","golf","f1","ufc"];
-export const IND_LABEL:Record<IndSport,string>={tennis:"التنس",golf:"الغولف",f1:"الفورمولا 1",ufc:"الفنون القتالية"};
+export type IndSport="tennis"|"golf"|"f1"|"racing"|"ufc";
+export const IND_SPORTS:IndSport[]=["tennis","golf","f1","racing","ufc"];
+export const IND_LABEL:Record<IndSport,string>={tennis:"التنس",golf:"الغولف",f1:"الفورمولا 1",racing:"سباقات السيارات",ufc:"الفنون القتالية"};
+/** صفحة /individual/racing تجمع الفورمولا 1 + إندي كار + ناسكار */
+const SPORT_GROUP:Partial<Record<IndSport,IndSport[]>>={racing:["f1","racing"]};
+const sportsOf=(s:IndSport)=>SPORT_GROUP[s]??[s];
+const sportFilter=(s:IndSport)=>{const g=sportsOf(s);return g.length>1?`sport=in.(${g.join(",")})`:`sport=eq.${s}`};
+/** هل الحدث (بالـsport تاعو) ينتمي لصفحة الرياضة هادي */
+export const belongsTo=(page:IndSport,eventSport:string)=>(sportsOf(page) as string[]).includes(eventSport);
+/** أسماء الجولات/البطولات بالعربية */
+export const TOUR_LABEL:Record<string,string>={atp:"ATP",wta:"WTA",pga:"PGA",lpga:"الغولف النسائي LPGA",eur:"الجولة الأوروبية",liv:"LIV غولف","champions-tour":"جولة الأبطال",f1:"الفورمولا 1",irl:"إندي كار","nascar-premier":"ناسكار كأس","nascar-secondary":"ناسكار إكسفينيتي",ufc:"UFC",pfl:"PFL"};
+export const tourLabel=(t?:string|null)=>t?(TOUR_LABEL[t]??t.toUpperCase()):"";
 export const isIndSport=(s:string):s is IndSport=>(IND_SPORTS as string[]).includes(s);
 
 export type IndSet={v?:number;tb?:number};
@@ -23,7 +32,7 @@ const LIST_COLS="id,sport,tour,event_name,event_logo,start,end_date,state,detail
 export async function listIndEvents(sport:IndSport,daysBack=7,daysAhead=14):Promise<IndEvent[]|null>{
   try{
     const from=new Date(Date.now()-daysBack*864e5).toISOString(),to=new Date(Date.now()+daysAhead*864e5).toISOString();
-    const q=`ind_events?select=${LIST_COLS}&sport=eq.${sport}&state=neq.cal&start=lte.${encodeURIComponent(to)}&or=(end_date.gte.${encodeURIComponent(from)},start.gte.${encodeURIComponent(from)})&order=start.asc&limit=40`;
+    const q=`ind_events?select=${LIST_COLS}&${sportFilter(sport)}&state=neq.cal&start=lte.${encodeURIComponent(to)}&or=(end_date.gte.${encodeURIComponent(from)},start.gte.${encodeURIComponent(from)})&order=start.asc&limit=40`;
     return await db<IndEvent[]>(q);
   }catch{return null}
 }
@@ -31,7 +40,7 @@ export async function listIndEvents(sport:IndSport,daysBack=7,daysAhead=14):Prom
 /** المواعيد الجاية من رزنامة الموسم */
 export async function indCalendar(sport:IndSport):Promise<{tour:string|null;next:{name?:string;start?:string}[]}[]|null>{
   try{
-    const r=await db<{tour:string|null;payload:IndPayload|null}[]>(`ind_events?select=tour,payload&sport=eq.${sport}&state=eq.cal`);
+    const r=await db<{tour:string|null;payload:IndPayload|null}[]>(`ind_events?select=tour,payload&${sportFilter(sport)}&state=eq.cal`);
     return r?r.map(x=>({tour:x.tour,next:x.payload?.next??[]})):null;
   }catch{return null}
 }

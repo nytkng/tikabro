@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {notFound} from "next/navigation";
-import {IND_LABEL,getIndEvent,isIndSport,type IndPlayer,type TennisMatch} from "@/lib/individual";
+import {IND_LABEL,belongsTo,tourLabel,getIndEvent,isIndSport,type IndPlayer,type TennisMatch} from "@/lib/individual";
 
 export const dynamic="force-dynamic";
 
@@ -39,7 +39,7 @@ export default async function Page({params}:{params:Promise<{sport:string;id:str
   const {sport,id}=await params;
   if(!isIndSport(sport))notFound();
   const e=await getIndEvent(decodeURIComponent(id));
-  if(!e||e.sport!==sport)notFound();
+  if(!e||!belongsTo(sport,e.sport))notFound();
   const p=e.payload??{};
   const empty=<div className="rounded-2xl bg-card border border-line p-6 text-center text-mute">ماكانش معطيات بعد — راجع قريب.</div>;
   return (
@@ -49,7 +49,7 @@ export default async function Page({params}:{params:Promise<{sport:string;id:str
         {e.event_logo&&<img src={e.event_logo} alt="" width={48} height={48} className="h-12 w-12 object-contain" referrerPolicy="no-referrer" loading="lazy"/>}
         <div>
           <h1 className="font-display text-2xl text-white"><bdi>{e.event_name}</bdi></h1>
-          <div className="text-sm text-mute tabular-nums">{e.tour?.toUpperCase()} · {fmt(e.start)} {stateLabel(e.state)}</div>
+          <div className="text-sm text-mute tabular-nums">{tourLabel(e.tour)} · {fmt(e.start)} {stateLabel(e.state)}</div>
         </div>
       </header>
 
@@ -68,7 +68,7 @@ export default async function Page({params}:{params:Promise<{sport:string;id:str
           </table>
         </div>):empty)}
 
-      {sport==="f1"&&<>
+      {(e.sport==="f1"||e.sport==="racing")&&<>
         <h2 className="font-display mb-2 text-violet-300">الجلسات</h2>
         {(p.sessions?.length??0)>0?(
           <ol className="mb-6 space-y-2 border-r-2 border-violet-500/40 pr-4">

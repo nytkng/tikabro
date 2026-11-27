@@ -15,7 +15,7 @@ import type {Match,Sport} from "@/lib/types";
 import {getLang} from "@/lib/lang";
 import {t,locOf,leagueOf,type Key,type Lang} from "@/lib/i18n";
 export const dynamic="force-dynamic";
-const sports:[Key,Sport,string][]=[["sp.football","football","⚽"],["sp.basketball","basketball","🏀"],["sp.hockey","hockey","🏒"],["sp.american","american","🏈"],["sp.baseball","baseball","⚾"],["sp.rugby","rugby","🏉"],["sp.volleyball","volleyball","🏐"],["sp.aussie","aussie","🏉"]];
+const sports:[Key,Sport,string][]=[["sp.football","football","⚽"],["sp.basketball","basketball","🏀"],["sp.hockey","hockey","🏒"],["sp.american","american","🏈"],["sp.baseball","baseball","⚾"],["sp.rugby","rugby","🏉"],["sp.volleyball","volleyball","🏐"],["sp.aussie","aussie","🏉"],["sp.lacrosse","lacrosse","🥍"],["sp.fieldhockey","fieldhockey","🏑"]];
 const PRI=["alg.1","caf.champions","caf.confed","ksa.1","eng.1","esp.1","uefa.champions","ita.1","ger.1","fra.1","uefa.europa","uefa.europa.conf","mar.1","egy.1","tun.1","fifa.world","uefa.nations","por.1","ned.1","tur.1","bra.1","arg.1","usa.1","mex.1","eng.2","nba","nhl","nfl","mlb","wnba","180659","271937","270559","267979","270557","244293","college-football","mens-college-basketball"];
 const rank=(s?:string)=>{const i=PRI.indexOf(s||"");return i<0?999:i};
 const algDate=(off=0)=>new Date(Date.now()+off*864e5).toLocaleDateString("en-CA",{timeZone:"Africa/Algiers"});
@@ -54,7 +54,7 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
    <TrustLine lang={lang}/>
    <span hidden data-live-count={liveAll}/>
    {/* الرياضات */}
-   <nav aria-label={t(lang,"h.sports")} className="flex gap-2 mb-4 overflow-x-auto scroll-x -mx-3 px-3 sm:mx-0 sm:px-0">{[...sports.map(([tk,k,ic])=><a key={k} href={q({s:k})} aria-current={k===cur?"page":undefined} className={"sport-pill "+(k===cur?"on":"")}><span aria-hidden className="text-base">{ic}</span>{t(lang,tk)}<span className="cnt tabular-nums">{counts.get(k)||0}</span></a>),...([[t(lang,"sp.tennis"),"tennis","🎾"],[t(lang,"sp.golf"),"golf","⛳"],[t(lang,"sp.f1"),"f1","🏎️"],["UFC","ufc","🥊"]] as const).map(([tt,k,ic])=><a key={k} href={`/individual/${k}`} className="sport-pill"><span aria-hidden className="text-base">{ic}</span>{tt}</a>)]}</nav>
+   <nav aria-label={t(lang,"h.sports")} className="flex gap-2 mb-4 overflow-x-auto scroll-x -mx-3 px-3 sm:mx-0 sm:px-0">{[...sports.map(([tk,k,ic])=><a key={k} href={q({s:k})} aria-current={k===cur?"page":undefined} className={"sport-pill "+(k===cur?"on":"")}><span aria-hidden className="text-base">{ic}</span>{t(lang,tk)}<span className="cnt tabular-nums">{counts.get(k)||0}</span></a>),...([[t(lang,"sp.tennis"),"tennis","🎾"],[t(lang,"sp.golf"),"golf","⛳"],[t(lang,"sp.f1"),"f1","🏎️"],["UFC","ufc","🥊"],["سباقات السيارات","racing","🏁"]] as const).map(([tt,k,ic])=><a key={k} href={`/individual/${k}`} className="sport-pill"><span aria-hidden className="text-base">{ic}</span>{tt}</a>)]}</nav>
    {sample&&<div role="status" className="mb-4 rounded-xl border border-amber/40 bg-[#2A2110] text-amber text-sm px-4 py-3">{t(lang,"h.sample")}</div>}
    <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)_320px]">
     {/* العمود الأيمن: الدوريات */}

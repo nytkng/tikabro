@@ -4,7 +4,7 @@ import {predict,predictTwoWay,type Rec} from "./model";
 import type {Match,Sport} from "./types";
 import {arLeague} from "./arabic";
 export type Row={id:string;eid:string;sport:string;slug:string|null;league_name:string|null;league_logo:string|null;kickoff:string;state:string|null;detail:string|null;clock:string|null;home:string;away:string;home_logo:string|null;away_logo:string|null;home_rec:string|null;away_rec:string|null;score_h:number|null;score_a:number|null;home_form?:string|null;away_form?:string|null};
-const SPORT:Record<string,Sport>={soccer:"football",basketball:"basketball",hockey:"hockey",football:"american",baseball:"baseball",rugby:"rugby","rugby-league":"rugby",volleyball:"volleyball","australian-football":"aussie"};
+const SPORT:Record<string,Sport>={soccer:"football",basketball:"basketball",hockey:"hockey",football:"american",baseball:"baseball",rugby:"rugby","rugby-league":"rugby",volleyball:"volleyball","australian-football":"aussie",lacrosse:"lacrosse","field-hockey":"fieldhockey"};
 const rec=(s:string|null):Rec|null=>{if(!s||!/^\d+(-\d+){1,2}$/.test(s))return null;const a=s.split("-").map(Number);return a.length===3?{w:a[0],d:a[1],l:a[2]}:{w:a[0],d:0,l:a[1]}};
 export const COLS="id,eid,sport,slug,league_name,league_logo,kickoff,state,detail,clock,home,away,home_logo,away_logo,home_rec,away_rec,score_h,score_a";
 // أعمدة الفورمة (016) اختيارية: إذا ما زال ما تطبقش الـ SQL، نعاودو بلاها

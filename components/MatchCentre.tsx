@@ -1,5 +1,6 @@
 import {arLeague} from "@/lib/arabic";
 import {t,locOf,type Lang} from "@/lib/i18n";
+import Pitch,{type PP,type Team} from "@/components/viz/Pitch";
 /* مركز المباراة: بيانات ESPN summary (أحداث، إحصائيات، تشكيلة، مواجهات، ترتيب) */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Side={id:string;name:string;logo?:string};
@@ -73,11 +74,16 @@ async function load(id:string){
    stats.push({k,h:pct?String(hv):h.displayValue,a:pct?String(avv):a.displayValue,hv,av:avv})}}
 
  // تشكيلة
- const lineups:{f?:string;p:P[]}[]=[];
+ const lineups:{f?:string;p:P[]}[]=[];const pitch:Team[]=[];
  const rs:any[]=j.rosters||[];
- for(const sd of["home","away"]){const r=rs.find(x=>x.homeAway===sd);if(!r){lineups.push({p:[]});continue}
-  const p:P[]=((r.roster||[]) as any[]).filter(x=>x.starter).sort((a,b)=>num(a.formationPlace)-num(b.formationPlace)).map(x=>({n:x.athlete?.displayName||"",j:x.jersey||"",pos:x.position?.abbreviation||""}));
-  lineups.push({f:r.formation,p})}
+ const pp=(x:any):PP=>{const sv=(n:string)=>num(((x.stats||[]) as any[]).find(s=>s.name===n)?.value);
+  return{n:x.athlete?.displayName||"",sn:x.athlete?.shortName||"",j:String(x.jersey??""),pos:x.position?.abbreviation||"",fp:num(x.formationPlace),st:!!x.starter,g:sv("totalGoals")||sv("goals"),yc:sv("yellowCards"),rc:sv("redCards"),off:!!x.subbedOut,on:!!x.subbedIn}};
+ for(const sd of["home","away"] as const){const r=rs.find(x=>x.homeAway===sd);const nm=sd==="home"?home.name:away.name;if(!r){lineups.push({p:[]});pitch.push({name:nm,p:[],bench:[]});continue}
+  const all=((r.roster||[]) as any[]);
+  const p:P[]=all.filter(x=>x.starter).sort((a,b)=>num(a.formationPlace)-num(b.formationPlace)).map(x=>({n:x.athlete?.displayName||"",j:x.jersey||"",pos:x.position?.abbreviation||""}));
+  lineups.push({f:r.formation,p});
+  const c=r.coach?.[0]||r.coaches?.[0]||r.manager;const coach=c?(c.displayName||[c.firstName,c.lastName].filter(Boolean).join(" ")||undefined):undefined;
+  pitch.push({name:nm,f:r.formation,p:all.filter(x=>x.starter).map(pp),bench:all.filter(x=>!x.starter).map(pp).sort((a,b)=>Number(b.on)-Number(a.on)),coach})}
 
  // آخر النتائج
  const formOf=(sd:Side):G[]=>{const t=((j.lastFiveGames||j.boxscore?.form||[]) as any[]).find(x=>String(x.team?.id)===sd.id);
@@ -99,7 +105,7 @@ async function load(id:string){
   const idx=table.map((r,i)=>r.me?i:-1).filter(i=>i>=0);const lo=Math.max(0,Math.min(...idx)-1),hi=Math.min(table.length,Math.max(...idx)+2);
   table=hi-lo<=8?table.slice(lo,hi):table.filter((r,i)=>r.me||idx.some(x=>Math.abs(x-i)===1));break}
 
- return{soccer,home,away,events,scoring,leaders,stats,lineups,form,h2h,table,tSlug,tRaw}}
+ return{soccer,home,away,events,scoring,leaders,stats,lineups,pitch,form,h2h,table,tSlug,tRaw}}
 
 function Chips({g,lang}:{g:G[];lang:Lang}){return <div className="flex gap-1.5 flex-wrap">{g.map((x,i)=>{const r=RES[x.res]||["–","bg-line text-mute"];
  return <span key={i} title={`${x.opp} ${x.score}`} className={"w-7 h-7 rounded-lg text-sm font-bold flex items-center justify-center "+r[1]}>{RES_L[lang][x.res]||r[0]}</span>})}</div>}
@@ -138,7 +144,8 @@ export default async function MatchCentre({id,lang="ar",part="all"}:{id:string;l
      <bdi dir="ltr" className={"font-display text-lg tabular-nums "+(hw?"text-white":"text-mute")}>{s.h}</bdi><span className="text-mute text-xs">{statLabel(s.k,d.soccer,lang)}</span><bdi dir="ltr" className={"font-display text-lg tabular-nums "+(aw?"text-white":"text-mute")}>{s.a}</bdi></div>
      <div className="flex h-2 rounded-full overflow-hidden gap-[3px] bg-bg"><i style={{width:hp+"%"}} className={"bg-violet "+(hw?"":"opacity-50")}/><i style={{width:(100-hp)+"%"}} className={"bg-pink "+(aw?"":"opacity-50")}/></div></div>})}</div></Card>}
 
-  {on("lineups")&&hasLine&&<Card t={t(lang,"mc.lineups")}><div className="grid grid-cols-2 gap-4">{d.lineups.map((l,i)=><div key={i} className="min-w-0">
+  {on("lineups")&&hasLine&&d.soccer&&d.pitch.some(x=>x.p.length>=7)&&<Card t={t(lang,"mc.lineups")}><Pitch home={d.pitch[0]} away={d.pitch[1]} lang={lang}/></Card>}
+  {on("lineups")&&hasLine&&!(d.soccer&&d.pitch.some(x=>x.p.length>=7))&&<Card t={t(lang,"mc.lineups")}><div className="grid grid-cols-2 gap-4">{d.lineups.map((l,i)=><div key={i} className="min-w-0">
    <div className={"flex justify-between items-center text-sm mb-2 "+(i===0?"text-violet":"text-pink")}><span className="font-semibold truncate"><L>{i===0?home.name:away.name}</L></span>{l.f&&<bdi dir="ltr" className="text-amber tabular-nums text-xs">{l.f}</bdi>}</div>
    <ul className="flex flex-col gap-1.5">{l.p.map((p,k)=><li key={k} className="flex items-center gap-2 text-sm min-w-0">
     <span className={"w-7 h-7 flex-none rounded-lg flex items-center justify-center font-display tabular-nums text-bg "+(i===0?"bg-violet":"bg-pink")}>{p.j}</span>

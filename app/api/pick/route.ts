@@ -4,7 +4,7 @@ import {cookies} from "next/headers";
 import {dbRaw} from "@/lib/db";
 import {limit,TOO_MANY} from "@/lib/ratelimit";
 import {COOKIE,verifyCookie} from "@/lib/auth";
-const ID=/^(rugby-league|australian-football|soccer|basketball|hockey|football|baseball|rugby|volleyball)-([a-z0-9._-]+):(\d{3,12})$/i;
+const ID=/^(rugby-league|australian-football|field-hockey|lacrosse|soccer|basketball|hockey|football|baseball|rugby|volleyball)-([a-z0-9._-]+):(\d{3,12})$/i;
 const bad=(msg:string,status=400)=>NextResponse.json({error:true,msg},{status});
 export async function POST(req:Request){
   const pid=await verifyCookie((await cookies()).get(COOKIE)?.value);

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {notFound} from "next/navigation";
-import {IND_LABEL,IND_SPORTS,indCalendar,isIndSport,listIndEvents} from "@/lib/individual";
+import {IND_LABEL,IND_SPORTS,indCalendar,isIndSport,listIndEvents,tourLabel} from "@/lib/individual";
 
 export const dynamic="force-dynamic";
 
@@ -39,7 +39,7 @@ export default async function Page({params}:{params:Promise<{sport:string}>}){
           <p className="text-white">ماكانش منافسات هاد الأيام — الموسم متوقف حاليا.</p>
           {next.length>0?(
             <ul className="mt-4 space-y-2 text-sm">
-              {next.map((n,i)=><li key={i} className="flex justify-between text-mute"><bdi className="text-white">{n.name}</bdi><span className="tabular-nums text-amber-300">{fmt(n.start)}</span></li>)}
+              {next.map((n,i)=><li key={i} className="flex justify-between text-mute"><bdi className="text-white">{n.name}{n.tour?<span className="text-mute text-xs"> · {tourLabel(n.tour)}</span>:null}</bdi><span className="tabular-nums text-amber-300">{fmt(n.start)}</span></li>)}
             </ul>
           ):<p className="mt-2 text-sm text-mute">المواعيد الجاية ما تنشرتش بعد.</p>}
         </div>
@@ -51,7 +51,7 @@ export default async function Page({params}:{params:Promise<{sport:string}>}){
                 {e.event_logo&&<img src={e.event_logo} alt="" width={36} height={36} className="h-9 w-9 object-contain" referrerPolicy="no-referrer" loading="lazy"/>}
                 <div className="min-w-0 flex-1">
                   <div className="font-display truncate text-white border-b border-line/60 pb-1 mb-1"><bdi>{e.event_name}</bdi></div>
-                  <div className="text-xs text-mute tabular-nums">{e.tour?<>{e.tour.toUpperCase()}<span aria-hidden="true" className="mx-1.5 opacity-50">|</span></>:null}{fmt(e.start)}{e.end_date&&e.end_date!==e.start?` – ${fmt(e.end_date)}`:""}</div>
+                  <div className="text-xs text-mute tabular-nums">{e.tour?<>{tourLabel(e.tour)}<span aria-hidden="true" className="mx-1.5 opacity-50">|</span></>:null}{fmt(e.start)}{e.end_date&&e.end_date!==e.start?` – ${fmt(e.end_date)}`:""}</div>
                 </div>
                 <Badge state={stateOf(e)}/>
               </div>

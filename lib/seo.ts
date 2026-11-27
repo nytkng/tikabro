@@ -6,7 +6,7 @@ export const SITE_URL=(process.env.SITE_URL||"https://tikabro.thenytkng.workers.
 export const SITE_NAME="هدف";
 export const OG_IMAGE={url:"/opengraph-image",width:1200,height:630,alt:"HADAF"};
 export const TOP_LEAGUES:[string,string][]=[["soccer","eng.1"],["soccer","esp.1"],["soccer","ita.1"],["soccer","ger.1"],["soccer","fra.1"],["soccer","uefa.champions"],["soccer","alg.1"],["soccer","caf.champions"],["soccer","ksa.1"],["basketball","nba"],["hockey","nhl"],["football","nfl"],["baseball","mlb"]];
-export const IND_SPORTS_SEO=["tennis","golf","f1","ufc"];
+export const IND_SPORTS_SEO=["tennis","golf","f1","ufc","racing"];
 export const matchPath=(id:string)=>`/match/${encodeURIComponent(id)}`;
 const fmtKick=(iso:string)=>{try{return new Date(iso).toLocaleString("ar-DZ",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit",timeZone:"Africa/Algiers"})}catch{return ""}};
 export function pageMeta(title:string,description:string,path:string):Metadata{
