@@ -1,5 +1,5 @@
 import type {Match,Sport} from "./types";
-import {predict,predictDC,predictTwoWay,type Rec,type TeamGoals} from "./model";
+import {predict,predictDCFull,predictTwoWay,type Rec,type TeamGoals,type Ext} from "./model";
 const FEEDS:{sport:Sport;path:string}[]=[
  {sport:"football",path:"soccer/eng.1"},{sport:"football",path:"soccer/esp.1"},{sport:"football",path:"soccer/ger.1"},
  {sport:"football",path:"soccer/ita.1"},{sport:"football",path:"soccer/fra.1"},{sport:"football",path:"soccer/uefa.champions"},
@@ -51,9 +51,9 @@ export async function fetchDay(date:string):Promise<Match[]>{
         const st=e.status?.type?.state;
         const hs=parseInt(h.score,10),as=parseInt(a.score,10);
         const hr=recs(h),ar=recs(a);
-        let probs;
+        let probs,ext:Ext|undefined;
         const hg=gm?.map.get(String(h.team?.id)),ag=gm?.map.get(String(a.team?.id));
-        if(f.sport==="football"&&gm&&hg&&ag&&hg.gp>=3&&ag.gp>=3)probs=predictDC(hg,ag,{avg:gm.avg});
+        if(f.sport==="football"&&gm&&hg&&ag&&hg.gp>=3&&ag.gp>=3){const f=predictDCFull(hg,ag,{avg:gm.avg});probs=f.p;ext=f.ext}
         else if(total(hr.all)>0&&total(ar.all)>0){
           // نعتمد سجل الأرض لأصحاب الأرض وسجل الخارج للضيف إذا توفرا بعينة كافية، وإلا الكلي
           const H=total(hr.home)>=4?hr.home!:hr.all!,A=total(ar.road)>=4?ar.road!:ar.all!;
@@ -63,7 +63,7 @@ export async function fetchDay(date:string):Promise<Match[]>{
           home:h.team.displayName,away:a.team.displayName,kickoff:e.date,
           state:st==="in"?"live":st==="post"?"post":"pre",
           score:isNaN(hs)||isNaN(as)||st==="pre"?undefined:[hs,as],
-          probs,source:"espn"});
+          probs,ext,source:"espn"});
       }
     }catch{}
   }));

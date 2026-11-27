@@ -3,6 +3,7 @@ import Crest from "@/components/Crest";
 import {pickOf} from "@/lib/model";
 import {currentPlayer} from "@/lib/auth";
 import {db} from "@/lib/db";
+import Markets from "@/components/Markets";
 import PickButtons from "@/components/PickButtons";
 export default async function MatchPage({params}:{params:Promise<{id:string}>}){
   const {id}=await params;const key=decodeURIComponent(id);
@@ -35,5 +36,7 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
     :!open?<p className="text-sm text-mute">{mine?`توقعك المختوم: ${mine==="home"?"فوز "+m.home:mine==="away"?"فوز "+m.away:"تعادل"}. `:""}التوقعات مقفولة لأن المباراة بدأت.</p>
     :me?<><p className="text-sm text-mute mb-4">اختر قبل البداية. يُختم باسمك <b className="text-white">{me.nick}</b> وتقدر تبدلو لحد الصافرة.</p><PickButtons matchId={key} home={m.home} away={m.away} hasDraw={m.sport==="football"} current={mine}/></>
     :<><p className="text-sm text-mute mb-4">سجّل الدخول لتختم توقعك قبل البداية.</p><a href="/login" className="btn inline-flex items-center px-6 rounded-xl bg-violet text-bg font-semibold">دخول لتختم توقعك</a></>}
-   </section></div>);
+   </section>
+   {m.ext&&<Markets x={m.ext} home={m.home} away={m.away}/>}
+  </div>);
 }
