@@ -4,6 +4,7 @@ import Pitch,{type PP,type Team} from "@/components/viz/Pitch";
 /* مركز المباراة: بيانات ESPN summary (أحداث، إحصائيات، تشكيلة، مواجهات، ترتيب) */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Side={id:string;name:string;logo?:string};
+const sb=(v:any)=>v===true||(typeof v==="object"&&v!==null&&v.didSub===true);
 type Ev={min:string;kind:"goal"|"yc"|"rc"|"sub"|"pen"|"og";side:"home"|"away";who:string;who2?:string};
 type Stat={k:string;h:string;a:string;hv:number;av:number};
 type P={n:string;j:string;pos:string};
@@ -77,7 +78,7 @@ async function load(id:string){
  const lineups:{f?:string;p:P[]}[]=[];const pitch:Team[]=[];
  const rs:any[]=j.rosters||[];
  const pp=(x:any):PP=>{const sv=(n:string)=>num(((x.stats||[]) as any[]).find(s=>s.name===n)?.value);
-  return{n:x.athlete?.displayName||"",sn:x.athlete?.shortName||"",j:String(x.jersey??""),pos:x.position?.abbreviation||"",fp:num(x.formationPlace),st:!!x.starter,g:sv("totalGoals")||sv("goals"),yc:sv("yellowCards"),rc:sv("redCards"),off:!!x.subbedOut,on:!!x.subbedIn}};
+  return{n:x.athlete?.displayName||"",sn:x.athlete?.shortName||"",j:String(x.jersey??""),pos:x.position?.abbreviation||"",fp:num(x.formationPlace),st:!!x.starter,g:sv("totalGoals")||sv("goals"),yc:sv("yellowCards"),rc:sv("redCards"),off:sb(x.subbedOut),on:sb(x.subbedIn)}};
  for(const sd of["home","away"] as const){const r=rs.find(x=>x.homeAway===sd);const nm=sd==="home"?home.name:away.name;if(!r){lineups.push({p:[]});pitch.push({name:nm,p:[],bench:[]});continue}
   const all=((r.roster||[]) as any[]);
   const p:P[]=all.filter(x=>x.starter).sort((a,b)=>num(a.formationPlace)-num(b.formationPlace)).map(x=>({n:x.athlete?.displayName||"",j:x.jersey||"",pos:x.position?.abbreviation||""}));
