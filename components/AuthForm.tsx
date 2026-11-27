@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useRef,useState} from "react";
 const KEY=process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY;
-const inp="w-full h-12 rounded-xl bg-bg border border-line px-4 text-white outline-none focus:border-violet";
+const inp="w-full min-w-0 h-12 rounded-xl bg-bg border border-line px-4 text-white outline-none focus:border-violet";
 export default function AuthForm(){
   const [mode,setMode]=useState<"new"|"back">("new");
   const [nick,setNick]=useState(""),[code,setCode]=useState(""),[adult,setAdult]=useState(false);
