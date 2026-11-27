@@ -12,7 +12,7 @@ export function toMatch(r:Row):Match{
   const n=(x:Rec|null)=>x?x.w+x.d+x.l:0;
   const probs=h&&a&&n(h)>0&&n(a)>0?(sport==="football"||sport==="rugby"?predict(h,a):predictTwoWay(h,a)):undefined;
   const st=r.state==="in"?"live":r.state==="post"?"post":"pre";
-  return {id:`${r.sport}-${r.slug||"all"}:${r.eid}`,sport,league:arLeague(r.slug,r.league_name),slug:r.slug||"all",home:r.home,away:r.away,kickoff:r.kickoff,state:st,
+  return {id:`${r.sport}-${r.slug||"all"}:${r.eid}`,sport,league:arLeague(r.slug,r.league_name),leagueRaw:r.league_name,slug:r.slug||"all",home:r.home,away:r.away,kickoff:r.kickoff,state:st,
     score:st!=="pre"&&r.score_h!==null&&r.score_a!==null?[r.score_h,r.score_a]:undefined,probs,source:"espn",
     leagueLogo:r.league_logo,homeLogo:r.home_logo,awayLogo:r.away_logo,detail:r.detail,clock:r.clock,homeRec:r.home_rec,awayRec:r.away_rec};
 }

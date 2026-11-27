@@ -12,7 +12,7 @@ export default function LiveTicker({children}:{children:ReactNode}){
       if(hold||document.visibilityState!=="visible")return;
       const card=el.firstElementChild as HTMLElement|null;const step=(card?.offsetWidth||260)+10;
       const end=Math.abs(el.scrollLeft)+el.clientWidth>=el.scrollWidth-6;
-      if(end)el.scrollTo({left:0,behavior:"smooth"});else el.scrollBy({left:-step,behavior:"smooth"});
+      if(end)el.scrollTo({left:0,behavior:"smooth"});else el.scrollBy({left:getComputedStyle(el).direction==="rtl"?-step:step,behavior:"smooth"});
     },4000);
     return()=>{clearInterval(i);el.removeEventListener("pointerenter",on);el.removeEventListener("pointerleave",off);el.removeEventListener("focusin",on);el.removeEventListener("focusout",off);el.removeEventListener("touchstart",on)};
   },[]);
