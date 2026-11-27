@@ -77,19 +77,19 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
        <span className={"shrink-0 rounded-full px-3 py-1 font-semibold "+(top.state==="live"?"bg-pink/15 text-pink":"bg-amber/15 text-amber")}>{top.state==="live"?t(lang,"live_now"):t(lang,"h.match_of_day")}</span>
       </div>
       <div className="relative grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4 mt-5">
-       <div className="flex flex-col items-center gap-2.5 text-center min-w-0"><Crest name={top.home} size={72} logo={top.homeLogo}/><b className="text-white text-sm sm:text-base leading-6 line-clamp-2"><bdi>{top.home}</bdi></b>{top.homeRec&&<span className="text-[11px] text-mute tabular-nums" dir="ltr">{top.homeRec}</span>}</div>
+       <div className="flex flex-col items-center gap-2.5 text-center min-w-0"><Crest name={top.home} size={72} logo={top.homeLogo}/><b className="text-white text-sm sm:text-base leading-6 line-clamp-2"><bdi>{top.home}</bdi></b>{top.homeRec&&<span className="text-[11px] text-mute tabular-nums">{fmtRec(top.homeRec,lang)}</span>}</div>
        <div className="text-center scoreboard px-3 sm:px-5 py-3 rounded-2xl">
         {top.score?<><div className="font-display text-[44px] sm:text-6xl leading-none text-white tabular-nums" dir="ltr">{top.score[0]}<span className="text-mute mx-1.5">:</span>{top.score[1]}</div>{top.state==="live"&&<div className="mt-2 inline-flex items-center gap-1.5 text-pink text-xs font-semibold"><i className="live-dot !mb-0"/>{top.clock||t(lang,"live")}</div>}</>
         :<><div className="font-display text-[34px] sm:text-5xl leading-none text-white tabular-nums">{tm(top.kickoff)}</div><div className="mt-2 text-[11px] text-mute">{t(lang,"h.kick_in")} <Countdown lang={lang} to={top.kickoff} className="text-amber font-semibold tabular-nums"/></div></>}
        </div>
-       <div className="flex flex-col items-center gap-2.5 text-center min-w-0"><Crest name={top.away} size={72} logo={top.awayLogo}/><b className="text-white text-sm sm:text-base leading-6 line-clamp-2"><bdi>{top.away}</bdi></b>{top.awayRec&&<span className="text-[11px] text-mute tabular-nums" dir="ltr">{top.awayRec}</span>}</div>
+       <div className="flex flex-col items-center gap-2.5 text-center min-w-0"><Crest name={top.away} size={72} logo={top.awayLogo}/><b className="text-white text-sm sm:text-base leading-6 line-clamp-2"><bdi>{top.away}</bdi></b>{top.awayRec&&<span className="text-[11px] text-mute tabular-nums">{fmtRec(top.awayRec,lang)}</span>}</div>
       </div>
       {tp&&tpk&&<div className="relative mt-6 flex items-center gap-4 rounded-2xl bg-[#090C16]/70 border border-white/5 p-3 sm:p-4">
        <ProbRing h={tp.h} d={tp.d} a={tp.a} size={84} label={tlabel} pct={tp[tpk]} lang={lang}/>
        <div className="flex-1 min-w-0">
         <p className="text-[13px] text-[#C9CCE0]">{t(lang,"h.ai_sealed")} <b className="text-white"><bdi>{tlabel}</bdi></b></p>
         <div className="flex h-2 rounded-full overflow-hidden gap-[3px] mt-2.5" aria-hidden><i style={{width:tp.h+"%"}} className="bg-violet"/>{tp.d>0&&<i style={{width:tp.d+"%"}} className="bg-[#4A5273]"/>}<i style={{width:tp.a+"%"}} className="bg-pink"/></div>
-        <div className="flex justify-between text-[11px] text-mute mt-1.5 tabular-nums"><span>{tp.h}%</span>{tp.d>0&&<span>{t(lang,"draw")} {tp.d}%</span>}<span>{tp.a}%</span></div>
+        <div className="flex justify-between text-[11px] text-mute mt-1.5 tabular-nums"><span>{tp.h}%</span>{tp.d>0&&<span>{t(lang,"draw")} <bdi dir="ltr">{tp.d}%</bdi></span>}<span>{tp.a}%</span></div>
         {vs&&<p className="text-[11px] text-mute mt-2">{t(lang,"h.week")} <b className="text-pink tabular-nums" dir="ltr">{vs.humans}%</b> {t(lang,"h.vs_machine")} <b className="text-violet tabular-nums" dir="ltr">{vs.ai}%</b>. {t(lang,"h.with_who")}</p>}
        </div>
       </div>}
@@ -167,3 +167,7 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
    </div>
   </>);
 }
+
+function fmtRec(r:string,lang:string){const a=r.split("-");if(a.length<2)return r;const [w,d,l]=a.length===3?a:[a[0],"",a[1]];
+  const L=lang==="fr"?["V","N","D"]:lang==="en"?["W","D","L"]:["ف","ت","خ"];
+  return [w&&`${w}${L[0]}`,d&&`${d}${L[1]}`,l&&`${l}${L[2]}`].filter(Boolean).join(" · ")}
