@@ -10,6 +10,7 @@ import {currentPlayer} from "@/lib/auth";
 import {db} from "@/lib/db";
 import Markets from "@/components/Markets";
 import MatchCentre from "@/components/MatchCentre";
+import Comments from "@/components/Comments";
 import PickButtons from "@/components/PickButtons";
 import CrowdVsAI from "@/components/CrowdVsAI";
 import ShareCard from "@/components/ShareCard";
@@ -121,6 +122,7 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
    {!m.sample&&<CrowdVsAI home={m.home} away={m.away} hasDraw={hasDraw} counts={counts} ai={aiK} mine={mine} revealed={!!mine||!open} outcome={outcome}/>}
    {!m.sample&&<WhyCard m={m} sportPath={key.split("-")[0]} eid={eid}/>}
    {!m.sample&&<MatchCentre id={key}/>}
+   {!m.sample&&<Comments matchId={eid}/>}
    {m.ext&&<Markets x={m.ext} home={m.home} away={m.away}/>}
   </div>);
 }
