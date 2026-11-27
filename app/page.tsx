@@ -39,7 +39,7 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
   return(<>
    <LiveRefresh on={liveAll>0}/>
    {/* الرياضات */}
-   <div className="flex gap-2 mb-4 overflow-x-auto scroll-x">{sports.map(([t,k,ic])=><a key={k} href={q({s:k})} className={"shrink-0 flex items-center gap-2 h-11 px-4 rounded-xl text-sm border "+(k===cur?"bg-white !text-[#0B0D14] border-white font-semibold":"border-line text-[#C9CCE0] hover:text-white hover:bg-hover")}><span aria-hidden>{ic}</span>{t}<span className={"text-xs tabular-nums "+(k===cur?"!text-[#0B0D14]/50":"text-mute")}>{counts.get(k)||0}</span></a>)}</div>
+   <div className="flex gap-2 mb-4 overflow-x-auto scroll-x">{[...sports.map(([t,k,ic])=><a key={k} href={q({s:k})} className={"shrink-0 flex items-center gap-2 h-11 px-4 rounded-xl text-sm border "+(k===cur?"bg-white !text-[#0B0D14] border-white font-semibold":"border-line text-[#C9CCE0] hover:text-white hover:bg-hover")}><span aria-hidden>{ic}</span>{t}<span className={"text-xs tabular-nums "+(k===cur?"!text-[#0B0D14]/50":"text-mute")}>{counts.get(k)||0}</span></a>),...([["التنس","tennis","🎾"],["الغولف","golf","⛳"],["الفورمولا 1","f1","🏎️"],["UFC","ufc","🥊"]] as const).map(([t,k,ic])=><a key={k} href={`/individual/${k}`} className="shrink-0 flex items-center gap-2 h-11 px-4 rounded-xl text-sm border border-line text-[#C9CCE0] hover:text-white hover:bg-hover"><span aria-hidden>{ic}</span>{t}</a>)]}</div>
    {sample&&<div role="status" className="mb-4 rounded-xl border border-amber/40 bg-[#2A2110] text-amber text-sm px-4 py-3">مصدر البيانات غير متاح الآن، فهذه مباريات تجريبية للعرض فقط.</div>}
    <div className="grid gap-5 lg:grid-cols-[230px_minmax(0,1fr)_320px]">
     {/* العمود الأيمن: الدوريات */}
