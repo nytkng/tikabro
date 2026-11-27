@@ -1,5 +1,5 @@
 import {currentPlayer} from "@/lib/auth";
-const nav=[["الأرينا","/"],["الترتيب","/leaders"],["الباقات","/pricing"]];
+const nav=[["الأرينا","/"],["الترتيب","/leaders"],["سجل الـ AI","/ai"],["الباقات","/pricing"]];
 export default async function Header(){
   const me=await currentPlayer();
   return(<header className="flex flex-wrap items-center justify-between sm:justify-start gap-x-5 gap-y-2 px-4 sm:px-10 py-3 border-b border-line">
