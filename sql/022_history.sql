@@ -13,7 +13,7 @@ alter table public.hist_state enable row level security;
 grant all on public.hist_jobs, public.hist_matches, public.team_alias, public.hist_state to service_role;
 
 -- اسم موحّد: حروف صغار، بلا FC/CF/AC، بلا رموز
-create or replace function public.hadaf_norm(t text) returns text language sql immutable as $$
+create or replace function public.hadaf_hnorm(t text) returns text language sql immutable as $$
   select trim(regexp_replace(regexp_replace(lower(translate(coalesce(t,''),'áàâäãéèêëíìîïóòôöõúùûüñçÁÉÍÓÚÖÜ','aaaaaeeeeiiiiooooouuuuncaeiouou')),
     '\m(fc|cf|afc|ac|sc|ssc|as|ss|us|rc|cd|ud|sd|club|de|calcio|1\.|vfl|vfb|tsg|sv|fsv|bsc|ogc|stade|olympique|hove|albion)\M','','g'),'[^a-z0-9]+',' ','g'))
 $$;
@@ -56,10 +56,10 @@ begin
   -- 3) نربطو أسماء openfootball بفرق ESPN (نفس الدوري، أقرب اسم)
   for lg,espn in select * from (values('en.1','eng.1'),('es.1','esp.1'),('de.1','ger.1'),('it.1','ita.1'),('fr.1','fra.1')) v(a,b) loop
     for m in select distinct n from (select home n from hist_matches where league=lg union select away from hist_matches where league=lg) q loop
-      select t.key, t.nm, similarity(hadaf_norm(t.nm),hadaf_norm(m.n)) s into best from (
+      select t.key, t.nm, similarity(hadaf_hnorm(t.nm),hadaf_hnorm(m.n)) s into best from (
         select distinct 'soccer:'||home_id key, home nm from matches where slug=espn and home_id is not null
         union select distinct 'soccer:'||away_id, away from matches where slug=espn and away_id is not null) t
-        order by similarity(hadaf_norm(t.nm),hadaf_norm(m.n)) desc limit 1;
+        order by similarity(hadaf_hnorm(t.nm),hadaf_hnorm(m.n)) desc limit 1;
       if best.key is not null and best.s>=0.45 then
         insert into team_alias values(lg,m.n,best.key,best.nm,best.s) on conflict(league,src_name) do update set team_key=excluded.team_key,espn_name=excluded.espn_name,sim=excluded.sim; mapped:=mapped+1;
       else unm:=unm+1; end if;
