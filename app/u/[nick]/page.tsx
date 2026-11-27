@@ -15,9 +15,16 @@ export default async function Profile({params}:{params:Promise<{nick:string}>}){
     db<C[]>("rpc/profile_calls",post({p_player:p.id,p_limit:30})),
   ]);
   const s=st?.[0]??{n:0,hits:0,ai_hits:0,open:0,points:0,ai_points:0,days:0};
-  const ids=(calls||[]).map(c=>c.match_id).filter(x=>/^\d+$/.test(x));
-  const names=ids.length?await db<{match_id:string;home:string;away:string}[]>(`predictions?match_id=in.(${ids.join(",")})&select=match_id,home,away`):[];
-  const nm=new Map((names||[]).map(x=>[x.match_id,x]));
+  // أسماء الفرق من ESPN (جدول predictions ما فيه أسماء). نأخذ آخر 8 فقط ونخبّيها ساعة.
+  const nm=new Map<string,{home:string;away:string}>();
+  await Promise.all((calls||[]).slice(0,8).map(async c=>{
+    if(!/^\d{3,12}$/.test(c.match_id)||!/^[a-z0-9.]+$/i.test(c.league))return;
+    const sport=c.league==="nba"?"basketball":"soccer";
+    try{const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${c.league}/summary?event=${c.match_id}`,{next:{revalidate:3600}});
+      if(!r.ok)return;const cp=(await r.json())?.header?.competitions?.[0]?.competitors||[];
+      const h=cp.find((x:any)=>x.homeAway==="home")?.team?.displayName,a=cp.find((x:any)=>x.homeAway==="away")?.team?.displayName;
+      if(h&&a)nm.set(c.match_id,{home:h,away:a});}catch{}
+  }));
   const stars=starsOf(s.hits,s.n),rate=s.n?Math.round(s.hits/s.n*100):null;
   const lab=(c:C)=>{const m=nm.get(c.match_id);const w=c.pick==="home"?(m?`فوز ${m.home}`:"فوز الأرض"):c.pick==="away"?(m?`فوز ${m.away}`:"فوز الضيف"):"تعادل";return w};
   const col=p.hue??260;
