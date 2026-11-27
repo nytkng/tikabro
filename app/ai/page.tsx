@@ -8,6 +8,7 @@ import {arLeague} from "@/lib/arabic";
 import {LeagueBubbles} from "@/components/viz/Viz";
 import {getLang} from "@/lib/lang";
 import {t} from "@/lib/i18n";
+import MarketsRecord from "@/components/MarketsRecord";
 export const metadata={title:"سجل الـ AI"};
 type S={grp:string;k:string;n:number;hits:number;brier:number|null;logloss:number|null;crowd_cnt:number;crowd_brier:number|null;model_brier_c:number|null};
 type W={match_id:string;league:string|null;home:string;away:string;pick:string;outcome:string;prob:number;home_logo:string|null;away_logo:string|null;score_h:number|null;score_a:number|null};
@@ -86,6 +87,7 @@ export default async function AI(){
     <Calibration bins={bins}/>
     <p className="text-xs text-mute mt-3">الأعمدة الباهتة فيها عينة صغيرة (أقل من 20) وتتقلب بزاف.</p>
    </section>}
+   <MarketsRecord/>
 
    {cN>0&&cB!=null&&mB!=null&&<section className={card}>
     <h2 className="text-lg font-semibold text-white mb-1">الـ AI ضد الجمهور</h2>

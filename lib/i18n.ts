@@ -316,6 +316,15 @@ const D={
  "pitch.rc":{ar:"طرد",fr:"carton rouge",en:"red card"},
  "pitch.off":{ar:"خرج",fr:"remplacé",en:"subbed off"},
  "pitch.in":{ar:"دخل",fr:"entré",en:"subbed on"},
+ "poll.title":{ar:"التصويت السريع",fr:"Vote rapide",en:"Quick poll"},
+ "poll.ask":{ar:"شكون يربح؟ اضغط وصوّت",fr:"Qui gagne ? Touchez pour voter",en:"Who wins? Tap to vote"},
+ "poll.draw":{ar:"تعادل",fr:"Nul",en:"Draw"},
+ "poll.votes":{ar:"{n} صوت",fr:"{n} votes",en:"{n} votes"},
+ "poll.voted":{ar:"تم! تقدر تبدّل قبل ما يتسكّر",fr:"C'est fait ! Modifiable jusqu'à la clôture",en:"Done! You can change until it closes"},
+ "poll.closed":{ar:"التصويت تسكّر",fr:"Vote clôturé",en:"Poll closed"},
+ "poll.missing":{ar:"هاد التصويت ما كاينش",fr:"Ce vote n'existe pas",en:"This poll doesn't exist"},
+ "poll.cta":{ar:"سجّل باش توقعك يتحسب في الترتيب",fr:"Inscris-toi pour que ton pronostic compte au classement",en:"Sign up so your pick counts in the rankings"},
+ "poll.error":{ar:"صرا مشكل، عاود",fr:"Erreur, réessaie",en:"Error, try again"},
 } satisfies Record<string,E>;
 export type Key=keyof typeof D;
 export function t(l:Lang,k:Key,v?:Record<string,string|number>):string{

@@ -2,6 +2,7 @@ import {getDay} from "@/lib/day";
 import {matchFromDB,teamIds} from "@/lib/feed";
 import {goalsMap} from "@/lib/espn";
 import {predictDCFull} from "@/lib/model";
+import {dbGoals} from "@/lib/goals";
 import LiveRefresh from "@/components/LiveRefresh";
 export const dynamic="force-dynamic";
 import Crest from "@/components/Crest";
@@ -42,9 +43,12 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
   let m=/^\d{3,12}$/.test(eid0)?await matchFromDB(eid0).catch(()=>null):null;
   if(!m)m=(await getDay(date)).find(x=>x.id===key)??null;
   // الدوريات اللي عندها جدول ترتيب: Dixon-Coles كامل مع الأسواق
-  if(m&&m.sport==="football"&&!m.ext&&m.slug&&m.slug!=="all"){try{const gm=await goalsMap("soccer/"+m.slug);
-    if(gm){const raw=await teamIds(eid0);const hg=raw&&gm.map.get(raw.h),ag=raw&&gm.map.get(raw.a);
-      if(hg&&ag&&hg.gp>=3&&ag.gp>=3){const f=predictDCFull(hg,ag,{avg:gm.avg});m={...m,probs:f.p,ext:f.ext}}}}catch{}}
+  if(m&&m.sport==="football"&&!m.ext){let done=false;
+    if(m.slug&&m.slug!=="all"){try{const gm=await goalsMap("soccer/"+m.slug);
+      if(gm){const raw=await teamIds(eid0);const hg=raw&&gm.map.get(raw.h),ag=raw&&gm.map.get(raw.a);
+        if(hg&&ag&&hg.gp>=3&&ag.gp>=3){const f=predictDCFull(hg,ag,{avg:gm.avg});m={...m,probs:f.p,ext:f.ext};done=true}}}catch{}}
+    // بلا جدول ترتيب: نفس النموذج من نتائجنا المخزنة
+    if(!done){try{const g=await dbGoals(eid0,m.slug);if(g){const f=predictDCFull(g.h,g.a,{avg:g.avg});m={...m,probs:f.p,ext:f.ext}}}catch{}}}
   if(!m)return <div className="text-mute py-20 text-center">{t(lang,"m.notfound")} <a className="underline" href="/">{t(lang,"m.back")}</a></div>;
   const p=m.probs;const pk=p?pickOf(p):null;
   const me=await currentPlayer();
