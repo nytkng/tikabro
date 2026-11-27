@@ -16,7 +16,8 @@ const sports:[string,Sport,string][]=[["كرة القدم","football","⚽"],["�
 const PRI=["alg.1","caf.champions","caf.confed","ksa.1","eng.1","esp.1","uefa.champions","ita.1","ger.1","fra.1","uefa.europa","uefa.europa.conf","mar.1","egy.1","tun.1","fifa.world","uefa.nations","por.1","ned.1","tur.1","bra.1","arg.1","usa.1","mex.1","eng.2","nba","nhl","nfl","mlb","wnba","180659","271937","270559","267979","270557","244293","college-football","mens-college-basketball"];
 const rank=(s?:string)=>{const i=PRI.indexOf(s||"");return i<0?999:i};
 const algDate=(off=0)=>new Date(Date.now()+off*864e5).toLocaleDateString("en-CA",{timeZone:"Africa/Algiers"});
-const dayLabel=(d:string)=>new Date(d+"T12:00:00Z").toLocaleDateString("ar-DZ",{weekday:"short",day:"numeric",month:"short"});
+const wdLabel=(d:string)=>new Date(d+"T12:00:00Z").toLocaleDateString("ar-DZ",{weekday:"long",timeZone:"UTC"});
+const dmLabel=(d:string)=>new Date(d+"T12:00:00Z").toLocaleDateString("ar-DZ",{day:"numeric",month:"long",timeZone:"UTC"});
 type Lead={nick:string;n:number;hits:number;points:number};
 export default async function Home({searchParams}:{searchParams:Promise<{s?:string;d?:string;l?:string;live?:string}>}){
   const sp=await searchParams;
@@ -103,8 +104,9 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
      </section>}
      {/* شريط الأيام */}
      <nav aria-label="الأيام" className="panel flex items-center gap-1 p-1 mb-3 overflow-x-auto scroll-x">
-      {days.map(d=><a key={d} href={q({d,l:sp.l})} aria-current={d===date?"date":undefined} className={"day-tab "+(d===date?"on":"")}>{d===today?"اليوم":d===algDate(-1)?"أمس":d===algDate(1)?"غدا":dayLabel(d).split(" ")[0]}<span className="block text-[11px] opacity-70 tabular-nums">{dayLabel(d)}</span></a>)}
+      {days.map(d=><a key={d} href={q({d,l:sp.l})} aria-current={d===date?"date":undefined} className={"day-tab "+(d===date?"on":"")}>{d===today?"اليوم":d===algDate(-1)?"أمس":d===algDate(1)?"غدا":wdLabel(d)}{" "}<span className="block text-[11px] opacity-70 tabular-nums">{dmLabel(d)}</span></a>)}
      </nav>
+     <p className="text-[11px] text-mute -mt-2 mb-3 px-1">الأوقات بتوقيت الجزائر</p>
      {/* الدوريات على الهاتف */}
      <div className="lg:hidden flex gap-2 mb-3 overflow-x-auto scroll-x -mx-3 px-3">
       {liveAll>0&&<a href={q({live:"1"})} className={"chip !text-pink "+(sp.live?"on-pink":"")}><i className="live-dot !mb-0"/>مباشر <span className="tabular-nums">{liveAll}</span></a>}

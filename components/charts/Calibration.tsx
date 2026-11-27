@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // مخطط المعايرة: واش قال الـ AI (بنفسجي فاتح) مقابل واش صرا فعلا (بنفسجي معبّى). SVG خالص.
 export type Bin={said:number;happened:number;n:number};
-export default function Calibration({bins}:{bins:Bin[]}){
+export default function Calibration({bins:raw}:{bins:Bin[]}){
+  const f=(v:unknown)=>{let x=Number(v);if(!isFinite(x))x=0;if(x>1)x/=100;return Math.max(0,Math.min(1,x))};
+  const bins:Bin[]=Array.from({length:10},(_,i)=>{const b=(raw||[]).find((r:any)=>Number(r?.bin)===i)??(raw||[])[i];return b?{said:f(b.said),happened:f(b.happened),n:Number(b.n)||0}:{said:0,happened:0,n:0}});
   const W=320,H=160,pad=18,bw=(W-pad)/10;
   return(<figure dir="ltr">
-    <svg viewBox={`0 0 ${W} ${H+18}`} className="w-full h-auto" role="img" aria-label="مخطط المعايرة: الاحتمال المقول مقابل النسبة الحقيقية">
+    <svg viewBox={`0 0 ${W} ${H+18}`} className="block w-full" style={{minHeight:160,height:"auto"}} preserveAspectRatio="xMidYMid meet" role="img" aria-label="مخطط المعايرة: الاحتمال المقول مقابل النسبة الحقيقية">
       {[0,.5,1].map(t=><g key={t}><line x1={pad} x2={W} y1={H-t*H} y2={H-t*H} stroke="#1E2436"/><text x={0} y={H-t*H+3} fontSize="8" fill="#9AA1B5">{t*100}</text></g>)}
       {bins.map((b,i)=>{const x=pad+i*bw+2,w=(bw-6)/2,s=b.n?b.said:0,h=b.n?b.happened:0;return <g key={i}>
         <title>{`${i*10}–${i*10+10}%: قال ${Math.round(s*100)}% · صرا ${Math.round(h*100)}% · ${b.n} احتمال`}</title>

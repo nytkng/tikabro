@@ -1,3 +1,4 @@
+import {arLeague} from "@/lib/arabic";
 /* مركز المباراة: بيانات ESPN summary (أحداث، إحصائيات، تشكيلة، مواجهات، ترتيب) */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Side={id:string;name:string;logo?:string};
@@ -51,7 +52,9 @@ async function load(id:string){
  const stats:Stat[]=[];
  if(th&&ta){const av=new Map<string,any>();for(const s of ta.statistics||[])av.set(s.name,s);
   for(const k of Object.keys(map)){const h=(th.statistics||[]).find((s:any)=>s.name===k),a=av.get(k);if(!h||!a)continue;
-   stats.push({k:map[k],h:h.displayValue,a:a.displayValue,hv:num(h.displayValue),av:num(a.displayValue)})}}
+   const pf=(x:any)=>{const v=num(x.displayValue);return k.endsWith("Pct")&&v<=1?Math.round(v*100):v};
+   const hv=pf(h),avv=pf(a);const pct=k.endsWith("Pct");
+   stats.push({k:map[k],h:pct?String(hv):h.displayValue,a:pct?String(avv):a.displayValue,hv,av:avv})}}
 
  // تشكيلة
  const lineups:{f?:string;p:P[]}[]=[];
@@ -73,7 +76,7 @@ async function load(id:string){
  type Row={pos:string;name:string;gp:string;pts:string;me:"home"|"away"|null};
  let table:Row[]=[];let tName="";
  for(const g of (j.standings?.groups||[]) as any[]){const en:any[]=g?.standings?.entries||[];
-  if(!en.some(e=>String(e.id??e.team?.id)===home.id||String(e.id??e.team?.id)===away.id))continue;tName=g.header||g.name||"";
+  if(!en.some(e=>String(e.id??e.team?.id)===home.id||String(e.id??e.team?.id)===away.id))continue;tName="الترتيب"+(arLeague(slug)?" · "+arLeague(slug):"");
   const st=(e:any,...ns:string[])=>{for(const n of ns){const s=(e.stats||[]).find((x:any)=>x.name===n||x.abbreviation===n);if(s)return String(s.displayValue??s.value??"")}return""};
   table=en.map((e,i)=>{const tid=String(e.id??e.team?.id);return{pos:st(e,"rank")||String(i+1),name:typeof e.team==="string"?e.team:(e.team?.shortDisplayName||e.team?.displayName||""),gp:st(e,"gamesPlayed","GP"),pts:st(e,"points","PTS","winPercent"),me:tid===home.id?"home":tid===away.id?"away":null}});
   // مقطع حول الفريقين فقط
