@@ -14,7 +14,7 @@ export default function MatchRow({m}:{m:Match}){
      :m.state==="post"?<span className="text-mute">انتهت</span>:<span className="text-[#C9CCE0] tabular-nums">{time(m.kickoff)}</span>}</span>
    <span className="min-w-0 flex flex-col gap-1.5">{team(m.home,m.homeLogo,m.score?.[0],win(0))}{team(m.away,m.awayLogo,m.score?.[1],win(1))}</span>
    {p?<span className="col-start-2 sm:col-start-3 flex flex-col gap-1"><span className="flex h-1.5 rounded-full overflow-hidden gap-[2px]"><i style={{width:p.h+"%"}} className="bg-violet"/>{p.d>0&&<i style={{width:p.d+"%"}} className="bg-[#4A5273]"/>}<i style={{width:p.a+"%"}} className="bg-pink"/></span>
-    <span className="text-[11px] text-mute truncate">الـ AI: <b className="text-[#C9CCE0] font-semibold">{label}</b> <bdi dir="ltr">{p[pk as "h"]}%</bdi></span></span>
+    <span className="text-[11px] text-mute truncate">توقع الـ AI: <bdi className="text-[#C9CCE0] font-semibold">{label}</bdi> <bdi dir="ltr">{p[pk as "h"]}%</bdi></span></span>
     :<span className="col-start-2 sm:col-start-3 text-[11px] text-mute">بيانات غير كافية للتوقع</span>}
   </a>);
 }
