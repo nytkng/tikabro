@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
-import {db} from "@/lib/db";
-// فحص بسيط: ما يكشف حتى معلومة على المفاتيح ولا نص الأخطاء
+import {dbRaw} from "@/lib/db";
+// فحص بسيط: ما يكشف حتى معلومة على المفاتيح
 export async function GET(){
-  const r=await db<unknown[]>("predictions?select=match_id&limit=1");
-  return Response.json({ok:true,db:r?"connected":"failed"},{headers:{"Cache-Control":"no-store"}});
+  const p=await dbRaw("predictions?select=match_id&limit=1");
+  const m=await dbRaw("matches?select=eid&limit=1");
+  return Response.json({ok:true,db:p.ok?"connected":"failed",feed:m.ok?"ok":`status ${m.status} ${String(m.json?.code||"")}`.trim()},{headers:{"Cache-Control":"no-store"}});
 }
