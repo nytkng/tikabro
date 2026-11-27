@@ -3,7 +3,7 @@ import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {dbRaw} from "@/lib/db";
 import {COOKIE,verifyCookie} from "@/lib/auth";
-const ID=/^(soccer|basketball)-([a-z0-9.]+):(\d{3,12})$/i;
+const ID=/^(soccer|basketball|hockey|football|baseball)-([a-z0-9._-]+):(\d{3,12})$/i;
 const bad=(msg:string,status=400)=>NextResponse.json({error:true,msg},{status});
 export async function POST(req:Request){
   const pid=await verifyCookie((await cookies()).get(COOKIE)?.value);
@@ -12,7 +12,7 @@ export async function POST(req:Request){
   const m=ID.exec(String(b?.matchId||"")),pick=String(b?.pick||"");
   if(!m||!["home","draw","away"].includes(pick))return bad("طلب غير صحيح.");
   const [,sport,league,eid]=m;
-  if(sport==="basketball"&&pick==="draw")return bad("ما كاين تعادل في كرة السلة.");
+  if(sport!=="soccer"&&pick==="draw")return bad("ما كاين تعادل في هذي الرياضة.");
   // وقت البداية والحالة نأخذهم نحن من المصدر، ما نثقوش في المتصفح
   let kickoff:string,state:string;
   try{

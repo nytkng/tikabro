@@ -14,7 +14,7 @@ function same(a:string,b:string){
 }
 
 async function result(p:P):Promise<{rh:number;ra:number}|"skip">{
-  const sport=p.league==="nba"?"basketball":"soccer";
+  const sport=p.league==="nba"||p.league==="wnba"?"basketball":p.league==="nhl"?"hockey":p.league==="nfl"?"football":p.league==="mlb"?"baseball":"soccer";
   try{
     const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${p.league}/summary?event=${p.match_id}`,{cache:"no-store"});
     if(!r.ok)return "skip";
@@ -39,7 +39,11 @@ export async function GET(req:Request){
   if(!rows)return NextResponse.json({error:"db read failed"},{status:502});
 
   let done=0,skipped=0,failed=0;
-  const res=await Promise.all(rows.map(async p=>({p,r:await result(p)})));
+  // النتيجة من جدول matches أولا (يتحدث من المصدر كل 5 دقائق)، وإلا من ESPN مباشرة
+  const ids=rows.map(r=>r.match_id).filter(x=>/^\d{3,12}$/.test(x));
+  const fin=ids.length?await db<{eid:string;state:string;score_h:number|null;score_a:number|null}[]>(`matches?eid=in.(${ids.join(",")})&state=eq.post&select=eid,state,score_h,score_a`):null;
+  const fm=new Map((fin||[]).filter(x=>x.score_h!==null&&x.score_a!==null).map(x=>[x.eid,{rh:x.score_h!,ra:x.score_a!}]));
+  const res=await Promise.all(rows.map(async p=>({p,r:fm.get(p.match_id)??await result(p)})));
   for(const {p,r} of res){
     if(r==="skip"){skipped++;continue}
     const outcome=r.rh>r.ra?"home":r.rh<r.ra?"away":"draw";

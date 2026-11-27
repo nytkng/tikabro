@@ -15,7 +15,7 @@ function recs(c:any){
   return {all:parse(list[0]?.summary),home:by("home"),road:by("road")||by("away")};
 }
 // أهداف الفريق من جدول الترتيب (مرة كل 6 ساعات)
-async function goalsMap(path:string):Promise<{map:Map<string,TeamGoals>;avg:number}|null>{
+export async function goalsMap(path:string):Promise<{map:Map<string,TeamGoals>;avg:number}|null>{
   try{
     const r=await fetch(`https://site.api.espn.com/apis/v2/sports/${path}/standings`,{next:{revalidate:21600}} as any);
     if(!r.ok)return null;

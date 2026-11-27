@@ -1,4 +1,9 @@
 import {getDay} from "@/lib/day";
+import {matchFromDB,teamIds} from "@/lib/feed";
+import {goalsMap} from "@/lib/espn";
+import {predictDCFull} from "@/lib/model";
+import LiveRefresh from "@/components/LiveRefresh";
+export const dynamic="force-dynamic";
 import Crest from "@/components/Crest";
 import {pickOf} from "@/lib/model";
 import {currentPlayer} from "@/lib/auth";
@@ -12,7 +17,13 @@ import {headers} from "next/headers";
 export default async function MatchPage({params}:{params:Promise<{id:string}>}){
   const {id}=await params;const key=decodeURIComponent(id);
   const date=new Date().toLocaleDateString("en-CA",{timeZone:"Africa/Algiers"});
-  const m=(await getDay(date)).find(x=>x.id===key);
+  const eid0=key.split(":")[1]||"";
+  let m=/^\d{3,12}$/.test(eid0)?await matchFromDB(eid0).catch(()=>null):null;
+  if(!m)m=(await getDay(date)).find(x=>x.id===key)??null;
+  // الدوريات اللي عندها جدول ترتيب: Dixon-Coles كامل مع الأسواق
+  if(m&&m.sport==="football"&&!m.ext&&m.slug&&m.slug!=="all"){try{const gm=await goalsMap("soccer/"+m.slug);
+    if(gm){const raw=await teamIds(eid0);const hg=raw&&gm.map.get(raw.h),ag=raw&&gm.map.get(raw.a);
+      if(hg&&ag&&hg.gp>=3&&ag.gp>=3){const f=predictDCFull(hg,ag,{avg:gm.avg});m={...m,probs:f.p,ext:f.ext}}}}catch{}}
   if(!m)return <div className="text-mute py-20 text-center">المباراة غير موجودة اليوم. <a className="underline" href="/">ارجع للأرينا</a></div>;
   const p=m.probs;const pk=p?pickOf(p):null;
   const me=await currentPlayer();
@@ -33,10 +44,13 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
   const aiK:K|null=pk2==="h"?"home":pk2==="a"?"away":pk2==="d"?"draw":null;
   const outcome:K|null=m.state==="post"&&m.score?(m.score[0]>m.score[1]?"home":m.score[0]<m.score[1]?"away":"draw"):null;
   return(<div className="flex flex-col gap-6">
+   <LiveRefresh on={m.state==="live"} every={45}/>
+   <a href="/" className="text-sm text-mute hover:text-white flex items-center gap-2">{m.leagueLogo?<img src={m.leagueLogo} alt="" width={18} height={18} referrerPolicy="no-referrer" className="w-[18px] h-[18px] object-contain"/>:null}{m.league} · رجوع للمباريات</a>
    <section className="rounded-[20px] bg-surface border border-line p-7 flex flex-wrap items-center justify-between gap-6">
-    <div className="flex items-center gap-4"><Crest name={m.home} size={64}/><span className="text-2xl font-bold text-white">{m.home}</span></div>
-    <div className="text-4xl font-bold text-white">{m.score?`${m.score[0]} - ${m.score[1]}`:new Date(m.kickoff).toLocaleTimeString("ar-DZ",{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Algiers"})}</div>
-    <div className="flex items-center gap-4"><span className="text-2xl font-bold text-white">{m.away}</span><Crest name={m.away} size={64}/></div></section>
+    <div className="flex items-center gap-4"><Crest name={m.home} size={64} logo={m.homeLogo}/><span className="text-2xl font-bold text-white">{m.home}</span></div>
+    <div className="text-center"><div className="text-4xl font-bold text-white tabular-nums">{m.score?`${m.score[0]} - ${m.score[1]}`:new Date(m.kickoff).toLocaleTimeString("ar-DZ",{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Algiers"})}</div>
+     <div className={"text-sm mt-1 "+(m.state==="live"?"text-pink font-semibold":"text-mute")}>{m.state==="live"?(m.clock||"مباشر"):m.state==="post"?"انتهت":new Date(m.kickoff).toLocaleDateString("ar-DZ",{weekday:"long",day:"numeric",month:"long",timeZone:"Africa/Algiers"})}</div></div>
+    <div className="flex items-center gap-4"><span className="text-2xl font-bold text-white">{m.away}</span><Crest name={m.away} size={64} logo={m.awayLogo}/></div></section>
    {pp?<section className="rounded-[20px] bg-surface border border-line p-7 flex flex-wrap items-center gap-6">
      <div className={"seal w-[120px] h-[120px] rounded-full border-[3px] flex items-center justify-center flex-none "+(sealed?"border-amber bg-[#2A2110]":"border-line bg-bg opacity-80")}><div className="w-[100px] h-[100px] rounded-full border border-dashed border-amber flex flex-col items-center justify-center text-amber"><b className="text-xl">{sealed?"مختوم":"مباشر"}</b><span className="text-[11px]">{sealed?"قبل البداية":"لم يُختم بعد"}</span></div></div>
      <div className="flex-1 min-w-[240px]"><div className="text-sm text-mute">{sealed?"توقع الـ AI المختوم":"تقدير الـ AI الآن (يُختم قبل البداية)"}</div><div className="text-3xl font-bold text-white my-1">{pk2==="h"?`فوز ${m.home}`:pk2==="a"?`فوز ${m.away}`:"تعادل"}</div>

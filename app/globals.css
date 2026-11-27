@@ -9,3 +9,6 @@ button,a.btn{min-height:44px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 html,body{overflow-x:hidden}
+.live-dot{width:7px;height:7px;border-radius:9999px;background:#E879A6;display:block;margin-bottom:2px;animation:livepulse 1.6s ease-in-out infinite}
+@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.live-dot{animation:none}}
