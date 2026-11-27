@@ -16,6 +16,8 @@ import PickButtons from "@/components/PickButtons";
 import CrowdVsAI from "@/components/CrowdVsAI";
 import ShareCard from "@/components/ShareCard";
 import WhyCard from "@/components/WhyCard";
+import PostMortem from "@/components/PostMortem";
+import FollowMatch from "@/components/FollowMatch";
 import {sha256} from "@/lib/auth";
 import {headers} from "next/headers";
 import ProbRing from "@/components/ui/ProbRing";
@@ -100,6 +102,7 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
      <bdi className="truncate flex-1 text-white text-end">{m.away}</bdi><Crest name={m.away} size={22} logo={m.awayLogo}/></div></StickyScore>
    <div className="flex flex-wrap items-center justify-between gap-2">
     <a href={m.slug&&m.slug!=="all"?`/league/${key.split("-")[0]}/${m.slug}`:"/"} className="chip hover:text-white">{m.leagueLogo?<img src={m.leagueLogo} alt="" width={18} height={18} referrerPolicy="no-referrer" className="w-[18px] h-[18px] object-contain"/>:null}<bdi className="truncate max-w-[190px]">{leagueOf(m,lang)}</bdi></a>
+    {!m.sample&&!post&&<FollowMatch id={eid} mkey={key} lang={lang}/>}
     {!m.sample&&<a href={`/live/${encodeURIComponent(key)}`} className="chip hover:text-white hover:bg-hover">{t(lang,"m.live_mode")}</a>}
    </div>
    <section id="stage" className="stage relative overflow-hidden rounded-[22px] px-4 pt-6 pb-5 sm:p-8">
@@ -145,6 +148,7 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
     :<><p className="text-sm text-mute mb-4">{t(lang,"m.login_to")}</p><a href="/login" className="btn cta inline-flex items-center px-6 rounded-xl font-semibold">{t(lang,"m.login_cta")}</a></>}
    </section>
    {!m.sample&&<CrowdVsAI lang={lang} home={m.home} away={m.away} hasDraw={hasDraw} counts={counts} ai={aiK} mine={mine} revealed={!!mine||!open} outcome={outcome}/>}
+   {!m.sample&&outcome&&<PostMortem lang={lang} m={m} outcome={outcome}/>}
    {!m.sample&&<div id="why" className="scroll-mt-20"><WhyCard lang={lang} m={m} sportPath={key.split("-")[0]} eid={eid}/></div>}
    {m.ext&&<Markets lang={lang} x={m.ext} home={m.home} away={m.away}/>}
    </>}

@@ -81,6 +81,12 @@ export default async function AI(){
     <p className="text-sm text-mute mb-4 leading-7">{t(lang,"viz.bubble_note")}</p>
     <LeagueBubbles lang={lang} data={lgs.map(s=>({k:s.k,label:(lang==="ar"?arLeague(s.k)||NAMES[s.k]:null)||s.k,n:s.n,hit:pct(s.hits,s.n)}))}/></section>}
 
+   {(()=>{const L=lgs.filter(s=>s.n>=10&&s.brier!=null).map(s=>({s,sk:1-(s.brier as number)/0.667})).sort((a,b)=>b.sk-a.sk);if(L.length<2)return null;const mx=Math.max(.01,...L.map(x=>x.sk));
+    return <section className={card}><h2 className="text-lg font-semibold text-white mb-1">{T("tr.title")}</h2><p className="text-sm text-mute mb-4 leading-7">{T("tr.note")}</p>
+     <ul className="flex flex-col gap-2.5">{L.slice(0,20).map(({s,sk})=>{const c=sk>=.12?"#2FBF71":sk>=.03?"#FFB020":"#E5484D";const lb=sk>=.12?"tr.high":sk>=.03?"tr.mid":"tr.low";
+      return <li key={s.k} className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 items-center text-sm"><span className="truncate text-white">{(lang==="ar"?arLeague(s.k)||NAMES[s.k]:null)||<bdi>{s.k}</bdi>} <span className="text-mute text-xs tabular-nums" dir="ltr">({s.n})</span></span>
+       <span className="text-xs font-semibold" style={{color:c}}>{T(lb as Parameters<typeof t>[1])}</span>
+       <span className="col-span-2 h-1.5 rounded-full bg-white/5 overflow-hidden"><i className="block h-full rounded-full" style={{width:`${Math.max(3,Math.round(100*Math.max(0,sk)/mx))}%`,background:c}}/></span></li>})}</ul></section>})()}
    {n>0&&<section className={card}>
     <h2 className="text-lg font-semibold text-white mb-1">{T("ai.calib")}</h2>
     <p className="text-sm text-mute mb-5 leading-7">{T("ai.calib_note")}</p>

@@ -7,3 +7,9 @@ export async function getLang():Promise<Lang>{
   const al=((await headers()).get("accept-language")||"").trim().toLowerCase().slice(0,2);
   return al==="fr"?"fr":al==="en"?"en":"ar";
 }
+
+// وضع خفيف: الكوكي، وإلا Save-Data من المتصفح.
+export async function getLite():Promise<boolean>{
+  const c=(await cookies()).get("hadaf_lite")?.value;if(c==="1")return true;if(c==="0")return false;
+  return ((await headers()).get("save-data")||"").toLowerCase()==="on";
+}
