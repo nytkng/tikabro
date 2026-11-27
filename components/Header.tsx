@@ -1,5 +1,5 @@
 import {currentPlayer} from "@/lib/auth";
-const nav=[["المباريات","/"],["الترتيب","/leaders"],["سجل الـ AI","/ai"],["الباقات","/pricing"]];
+const nav=[["المباريات","/"],["الترتيب","/leaders"],["دوريات الأصحاب","/groups"],["سجل الـ AI","/ai"],["تصنيف الفرق","/rankings"],["الباقات","/pricing"]];
 export default async function Header(){
   const me=await currentPlayer();
   return(<header className="sticky top-0 z-30 border-b border-line bg-[#0B0D14]/90 backdrop-blur">
