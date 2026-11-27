@@ -1,7 +1,9 @@
 export const dynamic="force-dynamic";
 import {NextResponse} from "next/server";
 import {dbRaw} from "@/lib/db";
-import {COOKIE,cookieOpts,cookieValue,newCode,nickOk,sha256,turnstileOk} from "@/lib/auth";
+import {cookies} from "next/headers";
+import {COOKIE,cookieOpts,cookieValue,newCode,nickOk,sha256,turnstileOk,unsignVal} from "@/lib/auth";
+import {GP} from "@/lib/google";
 export async function POST(req:Request){
   const b:any=await req.json().catch(()=>null);
   if(!b)return NextResponse.json({error:"bad"},{status:400});
@@ -11,13 +13,16 @@ export async function POST(req:Request){
   if(!b.adult)return NextResponse.json({error:"adult",msg:"لازم تؤكد أنك بلغت 18 سنة وتوافق على الشروط."},{status:400});
   if(!await turnstileOk(b.token,req.headers.get("CF-Connecting-IP")||undefined))
     return NextResponse.json({error:"captcha",msg:"فشل التحقق، أعد المحاولة."},{status:400});
+  const gh=b.google?await unsignVal((await cookies()).get(GP)?.value):null;
+  if(b.google&&!gh)return NextResponse.json({error:"google",msg:"انتهت جلسة جوجل، عاود اضغط «الدخول بجوجل»."},{status:400});
   const code=newCode();
   const r=await dbRaw("players",{method:"POST",headers:{Prefer:"return=representation"},
-    body:JSON.stringify({nick,recovery_hash:await sha256(code),hue:Math.floor(Math.random()*360),trust:0})});
+    body:JSON.stringify({nick,recovery_hash:await sha256(code),hue:Math.floor(Math.random()*360),trust:0,...(gh?{google_hash:gh}:{})})});
   if(r.status===409||r.json?.code==="23505")return NextResponse.json({error:"taken",msg:"هذا الاسم مأخوذ، اختر غيره."},{status:409});
   const id=r.json?.[0]?.id;
   if(!r.ok||!id)return NextResponse.json({error:"server",msg:"تعذّر التسجيل الآن، حاول بعد قليل."},{status:500});
-  const res=NextResponse.json({ok:true,nick,code});
+  const res=NextResponse.json({ok:true,nick,code,google:!!gh});
+  if(gh)res.cookies.delete(GP);
   res.cookies.set(COOKIE,await cookieValue(id),cookieOpts);
   return res;
 }

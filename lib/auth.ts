@@ -11,6 +11,14 @@ async function hmac(msg:string){
   return hex(await crypto.subtle.sign("HMAC",k,enc.encode(msg)));
 }
 export const COOKIE="hadaf_p";
+// توقيع قيمة عامة (للكوكي المؤقت تاع جوجل)
+export const signVal=async(v:string)=>`${v}.${await hmac("v:"+v)}`;
+export async function unsignVal(s?:string){
+  if(!s)return null;const i=s.lastIndexOf(".");if(i<1)return null;
+  const v=s.slice(0,i),sig=s.slice(i+1),want=await hmac("v:"+v);
+  if(sig.length!==want.length)return null;let d=0;for(let j=0;j<want.length;j++)d|=sig.charCodeAt(j)^want.charCodeAt(j);
+  return d===0?v:null;
+}
 export const cookieValue=async(id:string)=>`${id}.${await hmac(id)}`;
 export const cookieOpts={httpOnly:true,secure:true,sameSite:"lax" as const,path:"/",maxAge:60*60*24*365};
 export type Player={id:string;nick:string;hue:number|null;bio:string|null};
