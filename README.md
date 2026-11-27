@@ -73,4 +73,4 @@ Put them in `.env.local` for development and in Cloudflare secrets (`npx wrangle
 - Red lines: no stakes, no cash prizes, no odds or bookmaker affiliates.
 
 ## License
-License: to be chosen by the maintainer (AGPL-3.0 recommended).
+License: GNU AGPL-3.0 (see LICENSE). Open data under CC BY 4.0. The name «هدف / HADAF» and its logo are not covered by the code license..
