@@ -47,6 +47,7 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
   return(<div className="flex flex-col gap-6">
    <LiveRefresh on={m.state==="live"} every={45}/>
    <a href="/" className="text-sm text-mute hover:text-white flex items-center gap-2">{m.leagueLogo?<img src={m.leagueLogo} alt="" width={18} height={18} referrerPolicy="no-referrer" className="w-[18px] h-[18px] object-contain"/>:null}{m.league} · رجوع للمباريات</a>
+   {!m.sample&&<a href={`/live/${encodeURIComponent(key)}`} className="self-start text-xs rounded-full border border-amber/50 text-amber px-3 py-1.5 hover:bg-amber/10">🔴 وضع اللايف (للبث في TikTok)</a>}
    <section className="rounded-2xl bg-card border border-line p-7 flex flex-wrap items-center justify-between gap-6">
     <div className="flex items-center gap-4"><Crest name={m.home} size={64} logo={m.homeLogo}/><span className="text-2xl font-bold text-white">{m.home}</span></div>
     <div className="text-center"><div className="text-4xl font-bold text-white tabular-nums">{m.score?`${m.score[0]} - ${m.score[1]}`:new Date(m.kickoff).toLocaleTimeString("ar-DZ",{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Algiers"})}</div>
