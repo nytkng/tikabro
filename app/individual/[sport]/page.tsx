@@ -1,11 +1,13 @@
 import Link from "next/link";
 import {notFound} from "next/navigation";
-import {IND_LABEL,IND_SPORTS,indCalendar,isIndSport,listIndEvents,tourLabel} from "@/lib/individual";
+import {indLabel,IND_SPORTS,indCalendar,isIndSport,listIndEvents,tourLabel} from "@/lib/individual";
+import {getLang} from "@/lib/lang";
+import {t,dirOf,locOf,type Lang} from "@/lib/i18n";
 
 export const dynamic="force-dynamic";
 
-const fmt=(s?:string|null)=>s?new Date(s).toLocaleDateString("ar-DZ",{day:"numeric",month:"long",timeZone:"Africa/Algiers"}):"";
-const fmtDT=(s?:string|null)=>s?new Date(s).toLocaleString("ar-DZ",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"Africa/Algiers"}):"";
+const fmt=(s:string|null|undefined,l:Lang)=>s?new Date(s).toLocaleDateString(locOf(l),{day:"numeric",month:"long",timeZone:"Africa/Algiers"}):"";
+const fmtDT=(s:string|null|undefined,l:Lang)=>s?new Date(s).toLocaleString(locOf(l),{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"Africa/Algiers"}):"";
 function stateOf(e:{start:string|null;end_date:string|null;state:string|null}){
   const now=Date.now(),st=e.start?Date.parse(e.start):NaN;
   let en=e.end_date?Date.parse(e.end_date):NaN;
@@ -16,32 +18,32 @@ function stateOf(e:{start:string|null;end_date:string|null;state:string|null}){
   if(en<now)return "post";
   return "pre";
 }
-function Badge({state}:{state:string|null}){
-  if(state==="in")return <span className="rounded-full bg-pink-500/20 px-2 py-0.5 text-xs text-pink-300">جارية</span>;
-  if(state==="post")return <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-mute">انتهت</span>;
-  return <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs text-violet-300">قادمة</span>;
+function Badge({state,lang}:{state:string|null;lang:Lang}){
+  if(state==="in")return <span className="rounded-full bg-pink-500/20 px-2 py-0.5 text-xs text-pink-300">{t(lang,"ind.ongoing")}</span>;
+  if(state==="post")return <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-mute">{t(lang,"ind.ended")}</span>;
+  return <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs text-violet-300">{t(lang,"ind.upcoming")}</span>;
 }
 
 export default async function Page({params}:{params:Promise<{sport:string}>}){
-  const {sport}=await params;
+  const {sport}=await params;const lang=await getLang();
   if(!isIndSport(sport))notFound();
   const [events,cal]=await Promise.all([listIndEvents(sport),indCalendar(sport)]);
   const list=events??[];
   const next=(cal??[]).flatMap(c=>c.next.map(n=>({...n,tour:c.tour}))).sort((a,b)=>(a.start??"").localeCompare(b.start??"")).slice(0,6);
   return (
-    <main className="mx-auto max-w-4xl p-4" dir="rtl">
+    <main className="mx-auto max-w-4xl p-4" dir={dirOf(lang)}>
       <nav className="mb-4 flex gap-2 overflow-x-auto">
-        {IND_SPORTS.map(s=><Link key={s} href={`/individual/${s}`} className={`whitespace-nowrap rounded-2xl border border-line px-3 py-1.5 text-sm ${s===sport?"bg-violet-600 text-white":"bg-card text-mute"}`}>{IND_LABEL[s]}</Link>)}
+        {IND_SPORTS.map(s=><Link key={s} href={`/individual/${s}`} className={`whitespace-nowrap rounded-2xl border border-line px-3 py-1.5 text-sm ${s===sport?"bg-violet-600 text-white":"bg-card text-mute"}`}>{indLabel(s,lang)}</Link>)}
       </nav>
-      <h1 className="font-display mb-4 text-2xl text-white">{IND_LABEL[sport]}</h1>
+      <h1 className="font-display mb-4 text-2xl text-white">{indLabel(sport,lang)}</h1>
       {list.length===0?(
         <div className="rounded-2xl bg-card border border-line p-6 text-center">
-          <p className="text-white">ماكانش منافسات هاد الأيام — الموسم متوقف حاليا.</p>
+          <p className="text-white">{t(lang,"ind.off")}</p>
           {next.length>0?(
             <ul className="mt-4 space-y-2 text-sm">
-              {next.map((n,i)=><li key={i} className="flex justify-between text-mute"><bdi className="text-white">{n.name}{n.tour?<span className="text-mute text-xs"> · {tourLabel(n.tour)}</span>:null}</bdi><span className="tabular-nums text-amber-300">{fmt(n.start)}</span></li>)}
+              {next.map((n,i)=><li key={i} className="flex justify-between text-mute"><bdi className="text-white">{n.name}{n.tour?<span className="text-mute text-xs"> · {tourLabel(n.tour,lang)}</span>:null}</bdi><span className="tabular-nums text-amber-300">{fmt(n.start,lang)}</span></li>)}
             </ul>
-          ):<p className="mt-2 text-sm text-mute">المواعيد الجاية ما تنشرتش بعد.</p>}
+          ):<p className="mt-2 text-sm text-mute">{t(lang,"ind.no_next")}</p>}
         </div>
       ):(
         <div className="grid gap-3 sm:grid-cols-2">
@@ -51,11 +53,11 @@ export default async function Page({params}:{params:Promise<{sport:string}>}){
                 {e.event_logo&&<img src={e.event_logo} alt="" width={36} height={36} className="h-9 w-9 object-contain" referrerPolicy="no-referrer" loading="lazy"/>}
                 <div className="min-w-0 flex-1">
                   <div className="font-display truncate text-white border-b border-line/60 pb-1 mb-1"><bdi>{e.event_name}</bdi></div>
-                  <div className="text-xs text-mute tabular-nums">{e.tour?<>{tourLabel(e.tour)}<span aria-hidden="true" className="mx-1.5 opacity-50">|</span></>:null}{fmt(e.start)}{e.end_date&&e.end_date!==e.start?` – ${fmt(e.end_date)}`:""}</div>
+                  <div className="text-xs text-mute tabular-nums">{e.tour?<>{tourLabel(e.tour,lang)}<span aria-hidden="true" className="mx-1.5 opacity-50">|</span></>:null}{fmt(e.start,lang)}{e.end_date&&e.end_date!==e.start?` – ${fmt(e.end_date,lang)}`:""}</div>
                 </div>
-                <Badge state={stateOf(e)}/>
+                <Badge state={stateOf(e)} lang={lang}/>
               </div>
-              {e.start&&<div className="mt-2 text-xs text-mute tabular-nums">{fmtDT(e.start)} <span className="opacity-70">بتوقيت الجزائر</span></div>}
+              {e.start&&<div className="mt-2 text-xs text-mute tabular-nums">{fmtDT(e.start,lang)} <span className="opacity-70">{t(lang,"ind.tz")}</span></div>}
             </Link>
           ))}
         </div>

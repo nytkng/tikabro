@@ -4,7 +4,7 @@ import {db} from "@/lib/db";
 import {getLang} from "@/lib/lang";
 import {t,dirOf} from "@/lib/i18n";
 import Recompute from "@/components/ledger/Recompute";
-export const metadata={title:"تحقّق بنفسك"};
+export async function generateMetadata(){return {title:t(await getLang(),"vf.title")}}
 type L={seq:number;match_id:string;payload:string;entry_hash:string;prev_hash:string;created_at:string};
 type D={day:string;last_seq:number|null;root_hash:string|null;ots_proof:string|null};
 

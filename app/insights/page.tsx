@@ -9,7 +9,7 @@ import {Section,RingCard,Teams,href} from "@/components/insights/Card";
 import {getLang} from "@/lib/lang";
 import {t,type Key,type Lang} from "@/lib/i18n";
 const SPK:Record<string,Key>={football:"sp.football",basketball:"sp.basketball",hockey:"sp.hockey",american:"sp.american",baseball:"sp.baseball",rugby:"sp.rugby",volleyball:"sp.volleyball",aussie:"sp.aussie",tennis:"sp.tennis",handball:"sp.handball"};
-export const metadata={title:"رادار هدف"};
+export async function generateMetadata(){return {title:t(await getLang(),"i.title")}}
 const SP:Record<string,string>={football:"كرة القدم",basketball:"كرة السلة",hockey:"الهوكي",american:"كرة أمريكية",baseball:"البيسبول",rugby:"الرغبي",volleyball:"الطائرة",aussie:"كرة أسترالية",tennis:"التنس",handball:"اليد"};
 const K={h:"home",d:"draw",a:"away"} as const;
 const AR={home:"المستقبل",draw:"تعادل",away:"الضيف"} as const;

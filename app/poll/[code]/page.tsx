@@ -4,7 +4,7 @@ import {getLang} from "@/lib/lang";
 import {t} from "@/lib/i18n";
 import {pollByCode,pollCounts,isOpen} from "@/components/poll/lib";
 import PollVote from "@/components/poll/PollVote";
-export const metadata={title:"التصويت السريع"};
+export async function generateMetadata(){return {title:t(await getLang(),"poll.title")}}
 export default async function PollPage({params}:{params:Promise<{code:string}>}){
   const code=(await params).code;const l=await getLang();
   const p=await pollByCode(code);

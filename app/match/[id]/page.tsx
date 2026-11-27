@@ -80,7 +80,7 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
   const tabHref=(x:Tab)=>`/match/${encodeURIComponent(key)}${x==="pred"?"":"?tab="+x}#tabs`;
   const side=(i:0|1)=>{const n=i?m.away:m.home,l=i?m.awayLogo:m.homeLogo;return(<div className="flex flex-col items-center gap-2.5 min-w-0 text-center">
     <span className={"rounded-full p-1 "+(win(i)?"ring-2 ring-amber/70 shadow-[0_0_30px_-6px_var(--glow-amber)]":"")}><Crest name={n} size={72} logo={l}/></span>
-    <span className={"text-[15px] sm:text-lg font-semibold leading-6 line-clamp-2 "+(post&&!win(i)?"text-mute":"text-white")}><bdi>{n}</bdi></span>
+    {(()=>{const tid=i?ids?.a:ids?.h,cl="text-[15px] sm:text-lg font-semibold leading-6 line-clamp-2 "+(post&&!win(i)?"text-mute":"text-white");return tid?<a href={`/team/${sp}/${tid}`} className={cl+" hover:underline"}><bdi>{n}</bdi></a>:<span className={cl}><bdi>{n}</bdi></span>})()}
     <span className="text-[11px] text-mute">{t(lang,i?"away_side":"home_side")}</span>{!post&&<FormBoxes f={i?m.awayForm:m.homeForm} lang={lang} size="md"/>}</div>)};
   const H2=({c,children}:{c:string;children:React.ReactNode})=><h2 className="font-display text-xl text-white mb-1 flex items-center gap-2"><i aria-hidden className={"w-1.5 h-5 rounded-full "+c}/>{children}</h2>;
   return(<div className="flex flex-col gap-5 pb-6">

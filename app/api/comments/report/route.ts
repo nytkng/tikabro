@@ -1,18 +1,20 @@
 export const dynamic="force-dynamic";
 import {NextResponse} from "next/server";
+import {t} from "@/lib/i18n";
+import {langOf} from "@/lib/apiLang";
 import {cookies} from "next/headers";
 import {dbRaw} from "@/lib/db";
 import {limit,TOO_MANY} from "@/lib/ratelimit";
 import {COOKIE,verifyCookie} from "@/lib/auth";
 const bad=(msg:string,status=400)=>NextResponse.json({error:true,msg},{status});
-export async function POST(req:Request){
+export async function POST(req:Request){const L=langOf(req);
   const pid=await verifyCookie((await cookies()).get(COOKIE)?.value);
-  if(!pid)return bad("سجّل الدخول أولا.",401);
+  if(!pid)return bad(t(L,"api.login"),401);
   const b:any=await req.json().catch(()=>null);
   const id=Number(b?.id);
-  if(!Number.isSafeInteger(id)||id<1)return bad("طلب غير صحيح.");
+  if(!Number.isSafeInteger(id)||id<1)return bad(t(L,"api.bad_req"));
   if(!await limit(`cmtrep:${pid}`,3600,20))return bad(TOO_MANY,429);
   const r=await dbRaw("rpc/report_comment",{method:"POST",body:JSON.stringify({p_comment:id,p_player:pid})});
-  if(!r.ok)return bad("تعذّر إرسال البلاغ.",500);
+  if(!r.ok)return bad(t(L,"api.report_fail"),500);
   return NextResponse.json({ok:true});
 }

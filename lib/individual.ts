@@ -3,7 +3,9 @@ import {db} from "@/lib/db";
 
 export type IndSport="tennis"|"golf"|"f1"|"racing"|"ufc";
 export const IND_SPORTS:IndSport[]=["tennis","golf","f1","racing","ufc"];
+import {t,type Lang} from "@/lib/i18n";
 export const IND_LABEL:Record<IndSport,string>={tennis:"التنس",golf:"الغولف",f1:"الفورمولا 1",racing:"سباقات السيارات",ufc:"الفنون القتالية"};
+export const indLabel=(s:IndSport,l:Lang="ar")=>t(l,`ind.${s}`);
 /** صفحة /individual/racing تجمع الفورمولا 1 + إندي كار + ناسكار */
 const SPORT_GROUP:Partial<Record<IndSport,IndSport[]>>={racing:["f1","racing"]};
 const sportsOf=(s:IndSport)=>SPORT_GROUP[s]??[s];
@@ -12,7 +14,9 @@ const sportFilter=(s:IndSport)=>{const g=sportsOf(s);return g.length>1?`sport=in
 export const belongsTo=(page:IndSport,eventSport:string)=>(sportsOf(page) as string[]).includes(eventSport);
 /** أسماء الجولات/البطولات بالعربية */
 export const TOUR_LABEL:Record<string,string>={atp:"ATP",wta:"WTA",pga:"PGA",lpga:"الغولف النسائي LPGA",eur:"الجولة الأوروبية",liv:"LIV غولف","champions-tour":"جولة الأبطال",f1:"الفورمولا 1",irl:"إندي كار","nascar-premier":"ناسكار كأس","nascar-secondary":"ناسكار إكسفينيتي",ufc:"UFC",pfl:"PFL"};
-export const tourLabel=(t?:string|null)=>t?(TOUR_LABEL[t]??t.toUpperCase()):"";
+/** للفرنسية والإنجليزية: الأسماء الأصلية */
+const TOUR_LATIN:Record<string,string>={lpga:"LPGA",eur:"DP World Tour",liv:"LIV Golf","champions-tour":"PGA Tour Champions",f1:"Formula 1",irl:"IndyCar","nascar-premier":"NASCAR Cup","nascar-secondary":"NASCAR Xfinity"};
+export const tourLabel=(t?:string|null,l:Lang="ar")=>t?((l==="ar"?TOUR_LABEL[t]:TOUR_LATIN[t]??TOUR_LABEL[t])??t.toUpperCase()):"";
 export const isIndSport=(s:string):s is IndSport=>(IND_SPORTS as string[]).includes(s);
 
 export type IndSet={v?:number;tb?:number};

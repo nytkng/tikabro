@@ -7,15 +7,15 @@ import Crest from "@/components/Crest";
 import {arLeague} from "@/lib/arabic";
 import {LeagueBubbles} from "@/components/viz/Viz";
 import {getLang} from "@/lib/lang";
-import {t} from "@/lib/i18n";
+import {t,type Lang} from "@/lib/i18n";
 import MarketsRecord from "@/components/MarketsRecord";
-export const metadata={title:"سجل الـ AI"};
+export async function generateMetadata(){return {title:t(await getLang(),"ai.title")}}
 type S={grp:string;k:string;n:number;hits:number;brier:number|null;logloss:number|null;crowd_cnt:number;crowd_brier:number|null;model_brier_c:number|null};
 type W={match_id:string;league:string|null;home:string;away:string;pick:string;outcome:string;prob:number;home_logo:string|null;away_logo:string|null;score_h:number|null;score_a:number|null};
 type R={match_id:string;league:string|null;model_version:string|null;home:string;away:string;outcome:string|null;hit:boolean|null;p_home:number;p_draw:number|null;p_away:number;crowd_home:number|null;crowd_draw:number|null;crowd_away:number|null;crowd_n:number|null};
 const NAMES:Record<string,string>={"eng.1":"الدوري الإنجليزي","esp.1":"الدوري الإسباني","ger.1":"الدوري الألماني","ita.1":"الدوري الإيطالي","fra.1":"الدوري الفرنسي","uefa.champions":"أبطال أوروبا","caf.champions":"أبطال أفريقيا","nba":"NBA"};
-const VER:Record<string,string>={"v1-dc":"v1 · Dixon-Coles (القديم)","v0-rec-sql":"v0 · سجل SQL","v2-elo-crowd":"v2 · Elo + الجمهور"};
-const OUT:Record<string,string>={home:"فوز المستقبل",draw:"تعادل",away:"فوز الضيف"};
+const VER=(l:Lang):Record<string,string>=>({"v1-dc":t(l,"ai.v1"),"v0-rec-sql":t(l,"ai.v0"),"v2-elo-crowd":t(l,"ai.v2")});
+const OUT=(l:Lang,k:string)=>k==="home"?t(l,"ai.out.home"):k==="draw"?t(l,"ai.out.draw"):k==="away"?t(l,"ai.out.away"):k;
 const pct=(a:number,b:number)=>b?Math.round(100*a/b):0;
 const f3=(x:number|null|undefined)=>x==null?"—":x.toFixed(3);
 const sc=(x:number|null)=>x==null?null:x>1?x/100:x;
@@ -55,64 +55,61 @@ export default async function AI(){
   const brier=wavg(s=>s.brier,s=>s.n),cN=vers.reduce((a,s)=>a+s.crowd_cnt,0);
   const cB=wavg(s=>s.crowd_brier,s=>s.crowd_cnt),mB=wavg(s=>s.model_brier_c,s=>s.crowd_cnt);
   const card="rounded-2xl bg-card border border-line p-5";
-  const th="font-normal pb-2 text-right";
+  const th="font-normal pb-2 text-start";const T=(k:Parameters<typeof t>[1],v?:Record<string,string|number>)=>t(lang,k,v);
   const Table=({rows,name}:{rows:S[];name:(k:string)=>React.ReactNode})=>(<div className="overflow-x-auto"><table className="w-full text-sm tabular-nums">
-    <thead><tr className="text-mute"><th className={th}>الاسم</th><th className={th}>مباريات</th><th className={th}>إصابة</th><th className={th}>Brier</th><th className={th}>Log loss</th></tr></thead>
-    <tbody>{rows.map(s=><tr key={s.k} className="border-t border-line"><td className="py-2.5 text-white">{name(s.k)}</td><td dir="ltr" className="text-right">{s.n}</td><td dir="ltr" className="text-right">{pct(s.hits,s.n)}%</td>
-      <td dir="ltr" className={"text-right "+(s.brier!=null&&s.brier<0.667?"text-violet":"text-amber")}>{f3(s.brier)}</td><td dir="ltr" className="text-right text-mute">{f3(s.logloss)}</td></tr>)}</tbody></table></div>);
+    <thead><tr className="text-mute"><th className={th}>{T("ai.col.name")}</th><th className={th}>{T("ai.col.n")}</th><th className={th}>{T("ai.col.hit")}</th><th className={th}>Brier</th><th className={th}>Log loss</th></tr></thead>
+    <tbody>{rows.map(s=><tr key={s.k} className="border-t border-line"><td className="py-2.5 text-white">{name(s.k)}</td><td dir="ltr" className="text-start">{s.n}</td><td dir="ltr" className="text-start">{pct(s.hits,s.n)}%</td>
+      <td dir="ltr" className={"text-start "+(s.brier!=null&&s.brier<0.667?"text-violet":"text-amber")}>{f3(s.brier)}</td><td dir="ltr" className="text-start text-mute">{f3(s.logloss)}</td></tr>)}</tbody></table></div>);
   return(<div className="flex flex-col gap-6">
    <section className={card}>
-    <h1 className="text-3xl font-bold text-white">سجل الـ AI</h1>
-    <p className="text-mute mt-2 leading-7">كل توقع مختوم قبل البداية ومحسوم بعد النهاية. ما نخبيو حتى غلطة.</p>
-    {n===0?<p className="text-mute mt-6">مازال ما كاين توقعات محسومة.</p>:<>
+    <h1 className="text-3xl font-bold text-white">{T("ai.title")}</h1>
+    <p className="text-mute mt-2 leading-7">{T("ai.intro")}</p>
+    {n===0?<p className="text-mute mt-6">{T("ai.none")}</p>:<>
     <dl className="grid grid-cols-3 gap-4 mt-6">
-     <div><dt className="text-sm text-mute">مباريات محسومة</dt><dd className="font-display text-4xl text-white mt-1 tabular-nums" dir="ltr">{n}</dd></div>
-     <div><dt className="text-sm text-mute">نسبة الإصابة</dt><dd className="font-display text-4xl text-violet mt-1 tabular-nums" dir="ltr">{pct(hits,n)}%</dd></div>
-     <div><dt className="text-sm text-mute">Brier (أقل = أحسن)</dt><dd className="font-display text-4xl text-white mt-1 tabular-nums" dir="ltr">{f3(brier)}</dd></div>
+     <div><dt className="text-sm text-mute">{T("ai.settled")}</dt><dd className="font-display text-4xl text-white mt-1 tabular-nums" dir="ltr">{n}</dd></div>
+     <div><dt className="text-sm text-mute">{T("ai.rate")}</dt><dd className="font-display text-4xl text-violet mt-1 tabular-nums" dir="ltr">{pct(hits,n)}%</dd></div>
+     <div><dt className="text-sm text-mute">{T("ai.brier_lower")}</dt><dd className="font-display text-4xl text-white mt-1 tabular-nums" dir="ltr">{f3(brier)}</dd></div>
     </dl>
-    {brier!=null&&<div className="mt-5 flex flex-col gap-3"><Meter label="الـ AI تاعنا" value={brier} color="#8B7CFF"/><Meter label="اللي يعطي 33% لكل نتيجة" value={0.667} color="#9AA1B5"/></div>}
-    <p className="text-sm text-mute mt-4 leading-7">Brier يقيس قداش كانت الاحتمالات بعيدة على الواقع. واحد ما يعرف والو ويعطي ثلث لكل نتيجة ياخذ ‎0.667 ديما؛ كل ما نقص الرقم تحتو، كل ما كان الـ AI أصدق.</p></>}
+    {brier!=null&&<div className="mt-5 flex flex-col gap-3"><Meter label={T("ai.ours")} value={brier} color="#8B7CFF" lang={lang}/><Meter label={T("ai.uniform")} value={0.667} color="#9AA1B5" lang={lang}/></div>}
+    <p className="text-sm text-mute mt-4 leading-7">{T("ai.brier_note")}</p></>}
    </section>
 
-   {vers.length>0&&<section className={card}><h2 className="text-lg font-semibold text-white mb-4">مقارنة نسخ النموذج</h2><Table rows={vers} name={k=><bdi>{VER[k]||k}</bdi>}/></section>}
-   {lgs.length>0&&<section className={card}><h2 className="text-lg font-semibold text-white mb-4">حسب الدوري</h2><Table rows={lgs} name={k=>arLeague(k)||NAMES[k]||<bdi>{k}</bdi>}/></section>}
+   {vers.length>0&&<section className={card}><h2 className="text-lg font-semibold text-white mb-4">{T("ai.versions")}</h2><Table rows={vers} name={k=><bdi>{VER(lang)[k]||k}</bdi>}/></section>}
+   {lgs.length>0&&<section className={card}><h2 className="text-lg font-semibold text-white mb-4">{T("ai.by_league")}</h2><Table rows={lgs} name={k=>(lang==="ar"?arLeague(k)||NAMES[k]:null)||<bdi>{k}</bdi>}/></section>}
 
    {lgs.filter(s=>s.n>=5).length>=2&&<section className={card}><h2 className="text-lg font-semibold text-white mb-1">{t(lang,"viz.bubble")}</h2>
     <p className="text-sm text-mute mb-4 leading-7">{t(lang,"viz.bubble_note")}</p>
     <LeagueBubbles lang={lang} data={lgs.map(s=>({k:s.k,label:(lang==="ar"?arLeague(s.k)||NAMES[s.k]:null)||s.k,n:s.n,hit:pct(s.hits,s.n)}))}/></section>}
 
    {n>0&&<section className={card}>
-    <h2 className="text-lg font-semibold text-white mb-1">هل يصدق في احتمالاتو؟</h2>
-    <p className="text-sm text-mute mb-5 leading-7">كي يقول الـ AI «60%»، لازم الحاجة تصرا قريب 6 مرات من 10. الإطار هو واش قال، والمعبّى هو واش صرا. كي يتساواو، النموذج صادق.</p>
-    <Calibration bins={bins}/>
-    <p className="text-xs text-mute mt-3">الأعمدة الباهتة فيها عينة صغيرة (أقل من 20) وتتقلب بزاف.</p>
+    <h2 className="text-lg font-semibold text-white mb-1">{T("ai.calib")}</h2>
+    <p className="text-sm text-mute mb-5 leading-7">{T("ai.calib_note")}</p>
+    <Calibration bins={bins} lang={lang}/>
+    <p className="text-xs text-mute mt-3">{T("ai.calib_small")}</p>
    </section>}
-   <MarketsRecord/>
+   <MarketsRecord lang={lang}/>
 
    {cN>0&&cB!=null&&mB!=null&&<section className={card}>
-    <h2 className="text-lg font-semibold text-white mb-1">الـ AI ضد الجمهور</h2>
-    <p className="text-sm text-mute mb-4 leading-7">على <span dir="ltr" className="tabular-nums">{cN}</span> مباراة فيها توقعات الجمهور، نقارنو Brier تاع الزوج على نفس المباريات.</p>
-    <div className="flex flex-col gap-3"><Meter label="الـ AI" value={mB} color="#8B7CFF"/><Meter label="الجمهور" value={cB} color="#E879A6"/></div>
-    <p className="mt-4 font-semibold text-white">{Math.abs(mB-cB)<0.005?"تقريبا متعادلين.":mB<cB?"الـ AI أصدق من الجمهور حتى لدرك.":"الجمهور أصدق من الـ AI حتى لدرك، وهذا علاش نزيدو وزنو."}</p>
+    <h2 className="text-lg font-semibold text-white mb-1">{T("ai.vs_crowd")}</h2>
+    <p className="text-sm text-mute mb-4 leading-7">{T("ai.vs_note",{n:cN})}</p>
+    <div className="flex flex-col gap-3"><Meter label={T("ai.ai")} value={mB} color="#8B7CFF" lang={lang}/><Meter label={T("ai.crowd")} value={cB} color="#E879A6" lang={lang}/></div>
+    <p className="mt-4 font-semibold text-white">{T(Math.abs(mB-cB)<0.005?"ai.tie":mB<cB?"ai.ai_better":"ai.crowd_better")}</p>
    </section>}
 
    {worst.length>0&&<section className={card}>
-    <h2 className="text-lg font-semibold text-white mb-1">أكبر الأخطاء</h2>
-    <p className="text-sm text-mute mb-4">المرات اللي كان فيها الـ AI متأكد بزاف وطاح. نوريوهم باش تعرف حدودو.</p>
+    <h2 className="text-lg font-semibold text-white mb-1">{T("ai.worst")}</h2>
+    <p className="text-sm text-mute mb-4">{T("ai.worst_note")}</p>
     <ul className="flex flex-col">{worst.map(w=><li key={w.match_id} className="flex items-center gap-3 py-2.5 border-t border-line first:border-0 text-sm">
       <Crest name={w.home} logo={w.home_logo} size={24}/><bdi className="text-white truncate">{w.home}</bdi>
       {w.score_h!=null&&<span dir="ltr" className="tabular-nums text-mute">{w.score_h}-{w.score_a}</span>}
       <bdi className="text-white truncate">{w.away}</bdi><Crest name={w.away} logo={w.away_logo} size={24}/>
-      <span className="ms-auto text-mute whitespace-nowrap">قال {OUT[w.pick]} <b dir="ltr" className="text-amber tabular-nums">{Math.round(w.prob*100)}%</b> · صرا {OUT[w.outcome]}</span></li>)}</ul>
+      <span className="ms-auto text-mute whitespace-nowrap">{T("ai.said",{p:OUT(lang,w.pick),pc:Math.round(w.prob*100)+"%",o:OUT(lang,w.outcome)})}</span></li>)}</ul>
    </section>}
 
    <section className={card}>
-    <h2 className="text-lg font-semibold text-white mb-2">كيف يتعلّم؟</h2>
-    <ol className="list-decimal pr-5 text-sm text-mute leading-7 flex flex-col gap-1">
-     <li>كل فريق عندو تقييم <bdi>Elo</bdi>: يطلع كي يربح ويهبط كي يخسر، وقداش يتحرك يتعلق بقوة الخصم.</li>
-     <li>من فرق التقييم نحسبو احتمالات الفوز والتعادل والخسارة.</li>
-     <li>نخلطو هذي الاحتمالات مع توقعات الجمهور بوزن خاص بكل دوري.</li>
-     <li>كل ليلة نجربو أوزان مختلفة على المباريات اللي فاتت ونخلّيو اللي عطات أقل Brier.</li>
+    <h2 className="text-lg font-semibold text-white mb-2">{T("ai.how")}</h2>
+    <ol className="list-decimal ps-5 text-sm text-mute leading-7 flex flex-col gap-1">
+     {(["ai.how1","ai.how2","ai.how3","ai.how4"] as const).map(k=><li key={k}>{T(k)}</li>)}
     </ol>
    </section>
   </div>);

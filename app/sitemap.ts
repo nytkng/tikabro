@@ -18,5 +18,7 @@ export default async function sitemap():Promise<MetadataRoute.Sitemap>{
     rows=await db<R[]>(`matches?kickoff=gte.${encodeURIComponent(start)}&kickoff=lt.${encodeURIComponent(end)}&select=eid,sport,slug,kickoff&order=kickoff.asc&limit=500`);
   }catch{}
   const matches=(rows||[]).map(r=>({url:`${SITE_URL}/match/${encodeURIComponent(`${r.sport}-${r.slug||"all"}:${r.eid}`)}`,changeFrequency:"hourly" as const,priority:0.8,lastModified:now}));
-  return [...fixed,...matches];
+  const tr=await db<{key:string}[]>(`team_ratings?n=gte.10&select=key&order=elo.desc&limit=1000`).catch(()=>null);
+  const teams=(tr||[]).map(r=>{const [sp,i]=r.key.split(":");return {url:`${SITE_URL}/team/${sp}/${i}`,changeFrequency:"daily" as const,priority:0.6}});
+  return [...fixed,...matches,...teams];
 }

@@ -3,12 +3,14 @@ export const dynamic="force-dynamic";
 import {db} from "@/lib/db";
 import {weekVersus} from "@/lib/versus";
 import LiveRefresh from "@/components/LiveRefresh";
-export const metadata={title:"لوحة اللايف"};
+import {getLang} from "@/lib/lang";
+import {t} from "@/lib/i18n";
+export async function generateMetadata(){return {title:t(await getLang(),"lv.board")}}
 type Row={nick:string;n:number;hits:number;points:number};
 const isAI=(s:string)=>/ai|hadaf/i.test(s);
 const SITE="tikabro.thenytkng.workers.dev";
 export default async function Board({searchParams}:{searchParams:Promise<{g?:string}>}){
-  const {g:raw}=await searchParams;
+  const {g:raw}=await searchParams;const lang=await getLang();
   const code=String(raw||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
   const since=new Date(Date.now()-7*864e5).toISOString();
   const grp=/^[A-Z0-9]{8}$/.test(code)?(await db<{id:string;name:string}[]>(`groups?code=eq.${code}&select=id,name&limit=1`).catch(()=>null))?.[0]:undefined;
@@ -23,10 +25,10 @@ export default async function Board({searchParams}:{searchParams:Promise<{g?:str
   return(<div className="fixed inset-0 z-50 bg-[#0B0D14] overflow-hidden flex flex-col p-6 portrait:p-10 gap-5 portrait:gap-8">
    <LiveRefresh on every={30}/>
    <header className="flex items-center justify-between gap-4">
-    <div className="flex items-baseline gap-1"><span className="font-display text-5xl portrait:text-6xl text-white">هدف</span><i className="w-3 h-3 rounded-full bg-amber inline-block"/></div>
-    <div className="text-left"><div className="font-display text-3xl portrait:text-4xl text-white">{grp?<>دوري <bdi>{grp.name}</bdi></>:"توب 10 هاد الأسبوع"}</div><div className="text-mute text-sm portrait:text-lg">آخر 7 أيام · يتحدّث وحدو</div></div>
+    <div className="flex items-baseline gap-1"><span className="font-display text-5xl portrait:text-6xl text-white">{t(lang,"lv.brand")}</span><i className="w-3 h-3 rounded-full bg-amber inline-block"/></div>
+    <div className="text-end"><div className="font-display text-3xl portrait:text-4xl text-white">{grp?<bdi>{t(lang,"lv.league",{name:grp.name})}</bdi>:t(lang,"lv.top10")}</div><div className="text-mute text-sm portrait:text-lg">{t(lang,"lv.sub")}</div></div>
    </header>
-   {!list.length?<div className="flex-1 grid place-items-center text-center"><div><div className="font-display text-5xl text-amber mb-3">مازال ما كاين حتى توقع</div><div className="text-[#C9CCE0] text-2xl">كن الأول!</div></div></div>:
+   {!list.length?<div className="flex-1 grid place-items-center text-center"><div><div className="font-display text-5xl text-amber mb-3">{t(lang,"lv.empty")}</div><div className="text-[#C9CCE0] text-2xl">{t(lang,"lv.be_first")}</div></div></div>:
    <div className="flex-1 min-h-0 flex landscape:flex-row portrait:flex-col gap-6 portrait:gap-8">
     <div className="flex items-end justify-center gap-3 portrait:gap-5 landscape:w-[45%]">
      {order.map((r,i)=>r?<div key={r.nick} className="flex-1 max-w-56 flex flex-col items-center gap-2">
@@ -41,14 +43,14 @@ export default async function Board({searchParams}:{searchParams:Promise<{g?:str
       <span className="font-display text-2xl portrait:text-3xl text-mute w-8 tabular-nums">{i+4}</span>
       <b className={"flex-1 truncate text-xl portrait:text-2xl "+(isAI(r.nick)?"text-amber":"text-white")}>{isAI(r.nick)&&"🤖 "}<bdi>{r.nick}</bdi></b>
       <span className="text-mute tabular-nums portrait:text-xl">{r.hits}/{r.n}</span>
-      <span className="font-display text-2xl portrait:text-3xl text-white tabular-nums w-20 text-left">{r.points}</span>
+      <span className="font-display text-2xl portrait:text-3xl text-white tabular-nums w-20 text-end">{r.points}</span>
      </li>)}
     </ol>
    </div>}
    {vs&&<div className="rounded-3xl bg-card border border-line p-4 portrait:p-6">
-    <div className="flex justify-between text-lg portrait:text-2xl mb-2"><span className="text-violet">البشر <b className="font-display tabular-nums">{vs.humans}%</b></span><span className="text-mute text-sm portrait:text-lg self-center">نسبة الإصابة · 7 أيام</span><span className="text-amber"><b className="font-display tabular-nums">{vs.ai}%</b> الـ AI</span></div>
+    <div className="flex justify-between text-lg portrait:text-2xl mb-2"><span className="text-violet">{t(lang,"lv.humans")} <b className="font-display tabular-nums">{vs.humans}%</b></span><span className="text-mute text-sm portrait:text-lg self-center">{t(lang,"lv.rate7")}</span><span className="text-amber"><b className="font-display tabular-nums">{vs.ai}%</b> {t(lang,"ai.ai")}</span></div>
     <div className="h-4 portrait:h-5 rounded-full overflow-hidden flex bg-line"><i className="bg-violet" style={{width:`${100*vs.humans/((vs.humans+vs.ai)||1)}%`}}/><i className="bg-amber flex-1"/></div>
    </div>}
-   <footer className="text-center text-[#C9CCE0] text-xl portrait:text-3xl">توقّع معانا ضد الـ AI: <b className="text-white" dir="ltr">{SITE}</b></footer>
+   <footer className="text-center text-[#C9CCE0] text-xl portrait:text-3xl">{t(lang,"lv.cta")} <b className="text-white" dir="ltr">{SITE}</b></footer>
   </div>);
 }
