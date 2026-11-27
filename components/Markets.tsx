@@ -3,7 +3,7 @@ import type {Ext} from "@/lib/model";
 const Cell=({t,v,hot}:{t:string;v:number;hot:boolean})=>(
   <div className={"relative overflow-hidden rounded-xl border px-3.5 py-2.5 "+(hot?"border-teal/70":"border-line")}>
     <i aria-hidden className={"absolute inset-y-0 start-0 "+(hot?"bg-teal/25":"bg-white/[0.05]")} style={{width:v+"%"}}/>
-    <div className="relative flex items-center justify-between gap-3"><span className={"text-sm leading-6 "+(hot?"text-white font-semibold":"text-[#C9CCE0]")}>{t}</span><b dir="ltr" className={"tabular-nums "+(hot?"text-teal":"text-white")}>{v}%</b></div>
+    <div className="relative flex flex-col gap-1 min-w-0"><span className={"text-sm leading-5 break-words "+(hot?"text-white font-semibold":"text-[#C9CCE0]")}>{t}</span><b dir="ltr" className={"text-lg tabular-nums text-start "+(hot?"text-teal":"text-white")}>{v}%</b></div>
   </div>);
 const Group=({title,hint,children}:{title:string;hint?:string;children:React.ReactNode})=>(
   <div><h3 className="text-white font-semibold mb-1">{title}</h3>{hint&&<p className="text-xs text-mute mb-2.5">{hint}</p>}<div className="grid grid-cols-2 gap-2.5 mt-2">{children}</div></div>);
