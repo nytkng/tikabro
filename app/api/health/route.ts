@@ -10,7 +10,7 @@ export async function GET(){
     out.host_len=host.length;
     out.key_prefix=key.startsWith("sb_secret_")?"sb_secret":key.startsWith("eyJ")?"jwt":"unknown";
     try{
-      const r=await fetch(`${url}/rest/v1/predictions?select=id&limit=1`,{headers:{apikey:key,...(key.startsWith("sb_")?{}:{Authorization:`Bearer ${key}`})},cache:"no-store"});
+      const r=await fetch(`${url}/rest/v1/predictions?select=*&limit=1`,{headers:{apikey:key,...(key.startsWith("sb_")?{}:{Authorization:`Bearer ${key}`})},cache:"no-store"});
       out.status=r.status;
       if(!r.ok){out.error=(await r.text()).slice(0,160);}
       out.db=r.ok?"connected":"failed";
