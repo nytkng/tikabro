@@ -198,6 +198,11 @@ const D={
  "s.teams":{ar:"الفرق",fr:"Équipes",en:"Teams"},
  "s.next":{ar:"المباريات الجاية والحية",fr:"Matchs à venir et en direct",en:"Upcoming and live games"},
  "s.none":{ar:"ما لقينا حتى فريق فيه «{q}». جرّب الاسم بالحروف اللاتينية، كيما يكتبوه في ESPN.",fr:"Aucune équipe contenant « {q} ». Essayez le nom tel qu'écrit sur ESPN.",en:"No team matches “{q}”. Try the name as ESPN writes it."},
+ "hm.title":{ar:"كل يوم بلونو: شحال صاب الـ AI",fr:"Chaque jour en couleur : la réussite de l'IA",en:"Every day in colour: AI hit rate"},
+ "hm.note":{ar:"آخر 3 شهور. حط صبعك على مربع تشوف شحال صاب من شحال.",fr:"Les 3 derniers mois. Touchez un carré pour voir le détail.",en:"Last 3 months. Tap a square for the count."},
+ "hm.aria":{ar:"خريطة حرارية لنسبة الإصابة اليومية",fr:"Carte thermique de la réussite quotidienne",en:"Daily hit-rate heatmap"},
+ "ai.rps":{ar:"RPS (كل ما يصغر خير)",fr:"RPS (plus bas = mieux)",en:"RPS (lower is better)"},
+ "ai.rps_note":{ar:"RPS هو المقياس الرسمي لتوقعات الكورة بـ 3 نتائج: يعاقب أكثر كي تكون بعيد بزاف. تخمين بالصدفة يعطي حوالي 0.23.",fr:"Le RPS est la mesure de référence des pronostics foot à 3 issues : il pénalise davantage les erreurs lointaines. Le hasard donne environ 0,23.",en:"RPS is the standard score for 3-way football forecasts: it punishes far-off misses more. Random guessing scores about 0.23."},
  "w.note":{ar:"الأرقام احتمالات ماشي وعود. الـ AI يتعلّم من كل نتيجة ومن توقعات اللاعبين.",fr:"Les chiffres sont des probabilités, pas des promesses. L'IA apprend de chaque résultat et des pronostics des joueurs.",en:"Numbers are probabilities, not promises. The AI learns from every result and from players' picks."},
  // بطاقة المشاركة
  "s.btn":{ar:"شارك توقعك (صورة)",fr:"Partager mon pronostic (image)",en:"Share your pick (image)"},

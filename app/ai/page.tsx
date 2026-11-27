@@ -9,6 +9,7 @@ import {LeagueBubbles} from "@/components/viz/Viz";
 import {getLang} from "@/lib/lang";
 import {t,type Lang} from "@/lib/i18n";
 import MarketsRecord from "@/components/MarketsRecord";
+import DayHeat,{type Day} from "@/components/charts/DayHeat";
 export async function generateMetadata(){return {title:t(await getLang(),"ai.title")}}
 type S={grp:string;k:string;n:number;hits:number;brier:number|null;logloss:number|null;crowd_cnt:number;crowd_brier:number|null;model_brier_c:number|null};
 type W={match_id:string;league:string|null;home:string;away:string;pick:string;outcome:string;prob:number;home_logo:string|null;away_logo:string|null;score_h:number|null;score_a:number|null};
@@ -49,6 +50,12 @@ export default async function AI(){
     const rows=(await db<R[]>("predictions?settled_at=not.is.null&void=eq.false&outcome=not.is.null&select=match_id,league,model_version,home,away,outcome,hit,p_home,p_draw,p_away,crowd_home,crowd_draw,crowd_away,crowd_n&order=settled_at.desc&limit=5000"))||[];
     const l=local(rows);summary=summary||l.summary;bins=bins||l.bins;worst=worst||l.worst;
   }
+  const since=new Date(Date.now()-92*864e5).toISOString();
+  const rr=(await db<{settled_at:string;hit:boolean|null;outcome:string;p_home:number;p_draw:number|null;p_away:number}[]>(`predictions?settled_at=gte.${encodeURIComponent(since)}&void=eq.false&outcome=not.is.null&select=settled_at,hit,outcome,p_home,p_draw,p_away&limit=6000`))||[];
+  const dm=new Map<string,Day>();let rs=0,rn=0;
+  for(const r of rr){const k=r.settled_at.slice(0,10);const x=dm.get(k)||{d:k,n:0,h:0};x.n++;if(r.hit)x.h++;dm.set(k,x);
+    if(r.p_draw!=null){const ph=sc(r.p_home)!,pd=sc(r.p_draw)!;const oh=r.outcome==="home"?1:0,od=r.outcome==="draw"?1:0;rs+=((ph-oh)**2+(ph+pd-oh-od)**2)/2;rn++}}
+  const rps=rn?rs/rn:null;
   const vers=summary.filter(s=>s.grp==="version"),lgs=summary.filter(s=>s.grp==="league");
   const n=vers.reduce((a,s)=>a+s.n,0),hits=vers.reduce((a,s)=>a+s.hits,0);
   const wavg=(f:(s:S)=>number|null,w:(s:S)=>number)=>{let a=0,b=0;for(const s of vers){const v=f(s);if(v!=null){a+=v*w(s);b+=w(s)}}return b?a/b:null};
@@ -81,6 +88,8 @@ export default async function AI(){
     <p className="text-sm text-mute mb-4 leading-7">{t(lang,"viz.bubble_note")}</p>
     <LeagueBubbles lang={lang} data={lgs.map(s=>({k:s.k,label:(lang==="ar"?arLeague(s.k)||NAMES[s.k]:null)||s.k,n:s.n,hit:pct(s.hits,s.n)}))}/></section>}
 
+   {dm.size>0&&<section className={card}><h2 className="text-lg font-semibold text-white mb-1">{T("hm.title")}</h2><p className="text-sm text-mute mb-4 leading-7">{T("hm.note")}</p><DayHeat days={[...dm.values()]} lang={lang}/></section>}
+   {rps!=null&&<section className={card}><h2 className="text-lg font-semibold text-white mb-1">{T("ai.rps")}</h2><p className="font-display text-4xl text-white tabular-nums my-2" dir="ltr">{rps.toFixed(3)} <span className="text-sm text-mute font-sans">n={rn}</span></p><p className="text-sm text-mute leading-7">{T("ai.rps_note")}</p></section>}
    {(()=>{const L=lgs.filter(s=>s.n>=10&&s.brier!=null).map(s=>({s,sk:1-(s.brier as number)/0.667})).sort((a,b)=>b.sk-a.sk);if(L.length<2)return null;const mx=Math.max(.01,...L.map(x=>x.sk));
     return <section className={card}><h2 className="text-lg font-semibold text-white mb-1">{T("tr.title")}</h2><p className="text-sm text-mute mb-4 leading-7">{T("tr.note")}</p>
      <ul className="flex flex-col gap-2.5">{L.slice(0,20).map(({s,sk})=>{const c=sk>=.12?"#2FBF71":sk>=.03?"#FFB020":"#E5484D";const lb=sk>=.12?"tr.high":sk>=.03?"tr.mid":"tr.low";
