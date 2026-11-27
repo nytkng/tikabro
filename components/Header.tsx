@@ -4,7 +4,7 @@ import LivePill from "@/components/ui/LivePill";
 import LangSwitch from "@/components/LangSwitch";
 import {getLang} from "@/lib/lang";
 import {t,type Key} from "@/lib/i18n";
-const NAV:[Key,string][]=[["nav.matches","/"],["nav.radar","/insights"],["nav.creator","/creator"],["nav.leaders","/leaders"],["nav.groups","/groups"],["nav.ai","/ai"],["nav.rankings","/rankings"],["nav.pricing","/pricing"]];
+const NAV:[Key,string][]=[["nav.matches","/"],["s.title","/search"],["nav.radar","/insights"],["nav.creator","/creator"],["nav.leaders","/leaders"],["nav.groups","/groups"],["nav.ai","/ai"],["nav.rankings","/rankings"],["nav.pricing","/pricing"]];
 export default async function Header(){
   const [me,lang]=await Promise.all([currentPlayer(),getLang()]);
   const nav=NAV.map(([k,h])=>[t(lang,k),h]);

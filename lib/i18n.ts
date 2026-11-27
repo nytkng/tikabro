@@ -192,6 +192,12 @@ const D={
  "fl.err":{ar:"ما خدمتش. عاود جرّب.",fr:"Échec. Réessayez.",en:"That didn't work. Try again."},
  "mr.ai_t":{ar:"احتمال {x} حسب الـ AI",fr:"Probabilité de {x} selon l'IA",en:"AI probability of {x}"},
  "mr.was_draw":{ar:"والنتيجة تعادل",fr:"mais match nul",en:"but it was a draw"},
+ "s.title":{ar:"حوّس على فريق",fr:"Chercher une équipe",en:"Find a team"},
+ "s.ph":{ar:"اسم الفريق، مثلا: Real Madrid، MC Alger",fr:"Nom d'équipe, ex. : Real Madrid, MC Alger",en:"Team name, e.g. Real Madrid, MC Alger"},
+ "s.go":{ar:"حوّس",fr:"Chercher",en:"Search"},
+ "s.teams":{ar:"الفرق",fr:"Équipes",en:"Teams"},
+ "s.next":{ar:"المباريات الجاية والحية",fr:"Matchs à venir et en direct",en:"Upcoming and live games"},
+ "s.none":{ar:"ما لقينا حتى فريق فيه «{q}». جرّب الاسم بالحروف اللاتينية، كيما يكتبوه في ESPN.",fr:"Aucune équipe contenant « {q} ». Essayez le nom tel qu'écrit sur ESPN.",en:"No team matches “{q}”. Try the name as ESPN writes it."},
  "w.note":{ar:"الأرقام احتمالات ماشي وعود. الـ AI يتعلّم من كل نتيجة ومن توقعات اللاعبين.",fr:"Les chiffres sont des probabilités, pas des promesses. L'IA apprend de chaque résultat et des pronostics des joueurs.",en:"Numbers are probabilities, not promises. The AI learns from every result and from players' picks."},
  // بطاقة المشاركة
  "s.btn":{ar:"شارك توقعك (صورة)",fr:"Partager mon pronostic (image)",en:"Share your pick (image)"},
