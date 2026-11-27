@@ -13,6 +13,7 @@ export default async function Leaders({searchParams}:{searchParams:Promise<{r?:s
     db<Row[]>("rpc/leaderboard",post({p_since:since,p_min:1,p_days:1,p_age:"0 seconds"})),
     db<Ai[]>("rpc/ai_points",post({p_since:since})),
   ]);
+  const peer=await db<{nick:string;n:number;hits:number;peer:number;vs_ai:number|null}[]>("rpc/peer_board",post({p_since:all?"2020-01-01T00:00:00Z":new Date(Date.now()-30*864e5).toISOString(),p_min:all?10:5,p_limit:20}));
   const a=ai?.[0];
   const list:(Row&{ai?:boolean})[]=[...(rows||[])];
   if(a&&a.n>0)list.push({nick:t(lang,"ld.ai"),n:a.n,hits:a.hits,points:a.points,ai:true});
@@ -40,5 +41,12 @@ export default async function Leaders({searchParams}:{searchParams:Promise<{r?:s
      <span className="text-xs text-mute tabular-nums shrink-0">{t(lang,"ld.of",{h:x.hits,n:x.n})}</span>
      <b className="tabular-nums text-white shrink-0 min-w-[48px] text-end">{x.points}<span className="text-[10px] text-mute font-normal ms-1">{t(lang,"ld.p")}</span></b></li>)}</ol>)
    :<p className="panel p-5 text-mute leading-7">{t(lang,"ld.empty")}</p>}
+   {peer&&peer.length>0&&<section className="panel p-5"><h2 className="text-lg font-semibold text-white mb-1">{t(lang,"pr.title")}</h2><p className="text-sm text-mute mb-4 leading-7">{t(lang,"pr.note")}</p>
+    <ol className="flex flex-col gap-1">{peer.map((x,i)=><li key={x.nick} className="flex items-center gap-3 min-h-[48px] px-2 rounded-lg hover:bg-hover">
+     <b className="w-6 text-center tabular-nums text-mute">{i+1}</b>
+     <a href={`/u/${encodeURIComponent(x.nick)}`} className="flex-1 min-w-0 truncate font-semibold text-white hover:text-violet"><bdi>{x.nick}</bdi></a>
+     {x.vs_ai!=null&&<span title={t(lang,"pr.vs_ai")} className={"text-xs tabular-nums shrink-0 "+(x.vs_ai>0?"text-win":"text-mute")} dir="ltr">AI {x.vs_ai>0?"+":""}{x.vs_ai}</span>}
+     <span className="text-xs text-mute tabular-nums shrink-0">{t(lang,"ld.of",{h:x.hits,n:x.n})}</span>
+     <b className={"tabular-nums shrink-0 min-w-[56px] text-end "+(x.peer>0?"text-win":x.peer<0?"text-loss":"text-white")} dir="ltr">{x.peer>0?"+":""}{x.peer}</b></li>)}</ol></section>}
   </div>);
 }

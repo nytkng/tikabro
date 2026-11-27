@@ -203,6 +203,9 @@ const D={
  "hm.aria":{ar:"خريطة حرارية لنسبة الإصابة اليومية",fr:"Carte thermique de la réussite quotidienne",en:"Daily hit-rate heatmap"},
  "ai.rps":{ar:"RPS (كل ما يصغر خير)",fr:"RPS (plus bas = mieux)",en:"RPS (lower is better)"},
  "ai.rps_note":{ar:"RPS هو المقياس الرسمي لتوقعات الكورة بـ 3 نتائج: يعاقب أكثر كي تكون بعيد بزاف. تخمين بالصدفة يعطي حوالي 0.23.",fr:"Le RPS est la mesure de référence des pronostics foot à 3 issues : il pénalise davantage les erreurs lointaines. Le hasard donne environ 0,23.",en:"RPS is the standard score for 3-way football forecasts: it punishes far-off misses more. Random guessing scores about 0.23."},
+ "pr.title":{ar:"Peer score: شكون يغلب الجمهور؟",fr:"Peer score : qui bat la foule ?",en:"Peer score: who beats the crowd?"},
+ "pr.note":{ar:"ماشي غير شحال صبت: شحال صبت في المباريات اللي غلط فيها الناس. +10 معناها تصيب 10% أكثر من الجمهور في نفس المباريات. الأخضر يغلب، الأحمر يخسر.",fr:"Pas seulement combien tu as eu juste : combien tu as eu juste là où les autres se trompaient. +10 = 10 % de mieux que la foule sur les mêmes matchs.",en:"Not just how often you're right: how often you're right where others were wrong. +10 means 10% better than the crowd on the same games."},
+ "pr.vs_ai":{ar:"الفرق مع الـ AI في نفس المباريات",fr:"Écart avec l'IA sur les mêmes matchs",en:"Difference vs the AI on the same games"},
  "w.note":{ar:"الأرقام احتمالات ماشي وعود. الـ AI يتعلّم من كل نتيجة ومن توقعات اللاعبين.",fr:"Les chiffres sont des probabilités, pas des promesses. L'IA apprend de chaque résultat et des pronostics des joueurs.",en:"Numbers are probabilities, not promises. The AI learns from every result and from players' picks."},
  // بطاقة المشاركة
  "s.btn":{ar:"شارك توقعك (صورة)",fr:"Partager mon pronostic (image)",en:"Share your pick (image)"},
