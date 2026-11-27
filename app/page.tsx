@@ -12,7 +12,8 @@ export default async function Home(){
    {sample&&<div role="status" className="mb-5 rounded-xl border border-amber/40 bg-[#2A2110] text-amber text-sm px-4 py-3">مصدر البيانات غير متاح الآن، فهذه مباريات تجريبية للعرض فقط.</div>}
    {elite&&<section className="rounded-[20px] bg-surface border border-line p-7 mb-6"><div className="text-sm text-mute">اختيار اليوم الأقوى</div>
     <div className="text-3xl font-bold text-white mt-1">{elite.home} ضد {elite.away}</div>
-    <p className="text-mute mt-2 leading-7">ثقة الـ AI {Math.max(elite.probs!.h,elite.probs!.a)}%. التوقع يُختم قبل البداية ولا يتبدل.</p></section>}
-   <section className="rounded-[20px] bg-surface border border-line p-6"><h2 className="text-xl font-semibold text-white mb-2">مباريات اليوم</h2>
+    <p className="text-mute mt-2 leading-7">احتمال الـ AI {Math.max(elite.probs!.h,elite.probs!.a)}%. التوقع يُختم قبل البداية ولا يتبدل.</p></section>}
+   <section className="rounded-[20px] bg-surface border border-line p-6"><h2 className="text-xl font-semibold text-white mb-1">مباريات اليوم</h2>
+    <div className="flex flex-wrap gap-4 text-xs text-mute mb-2"><span><i className="inline-block w-2.5 h-2.5 rounded-full bg-violet align-middle ms-1"/>فوز الأرض</span><span><i className="inline-block w-2.5 h-2.5 rounded-full bg-[#4A5273] align-middle ms-1"/>تعادل</span><span><i className="inline-block w-2.5 h-2.5 rounded-full bg-pink align-middle ms-1"/>فوز الضيف</span></div>
     {ms.map(m=><MatchRow key={m.id} m={m}/>)}</section></>);
 }
