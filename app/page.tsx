@@ -3,6 +3,11 @@ import MatchRow from "@/components/MatchRow";
 import VersusBar from "@/components/VersusBar";
 import LiveRefresh from "@/components/LiveRefresh";
 import Crest from "@/components/Crest";
+import Countdown from "@/components/ui/Countdown";
+import LiveTicker from "@/components/ui/LiveTicker";
+import ProbRing from "@/components/ui/ProbRing";
+import Seal from "@/components/ui/Seal";
+import {pickOf} from "@/lib/model";
 import {weekVersus} from "@/lib/versus";
 import {db} from "@/lib/db";
 import type {Match,Sport} from "@/lib/types";
@@ -35,73 +40,123 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
   const top=pre.sort((a,b)=>rank(a.slug)-rank(b.slug)||Math.max(b.probs!.h,b.probs!.a)-Math.max(a.probs!.h,a.probs!.a))[0]||inSport.find(m=>m.state==="live");
   const days=[-2,-1,0,1,2].map(o=>algDate(o));
   const q=(o:{s?:string;d?:string;l?:string;live?:string})=>{const p=new URLSearchParams();const s=o.s??cur,d=o.d??date;if(s!=="football")p.set("s",s);if(d!==today)p.set("d",d);if(o.l)p.set("l",o.l);if(o.live)p.set("live","1");const t=p.toString();return t?`/?${t}`:"/"};
-  const card="rounded-2xl bg-card border border-line";
+  const tm=(iso:string)=>new Date(iso).toLocaleTimeString("ar-DZ",{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Algiers"});
+  const liveList=inSport.filter(m=>m.state==="live").sort((a,b)=>rank(a.slug)-rank(b.slug));
+  const st={live:ms.filter(m=>m.state==="live").length,pre:ms.filter(m=>m.state==="pre").length,post:ms.filter(m=>m.state==="post").length};
+  const tp=top?.probs,tpk=tp?pickOf(tp):null,tlabel=tpk==="h"?top!.home:tpk==="a"?top!.away:"تعادل";
+  const medals=["#FFB020","#C8CEDD","#C98A55"];
   return(<>
    <LiveRefresh on={liveAll>0}/>
+   <span hidden data-live-count={liveAll}/>
    {/* الرياضات */}
-   <div className="flex gap-2 mb-4 overflow-x-auto scroll-x">{[...sports.map(([t,k,ic])=><a key={k} href={q({s:k})} className={"shrink-0 flex items-center gap-2 h-11 px-4 rounded-xl text-sm border "+(k===cur?"bg-white !text-[#0B0D14] border-white font-semibold":"border-line text-[#C9CCE0] hover:text-white hover:bg-hover")}><span aria-hidden>{ic}</span>{t}<span className={"text-xs tabular-nums "+(k===cur?"!text-[#0B0D14]/50":"text-mute")}>{counts.get(k)||0}</span></a>),...([["التنس","tennis","🎾"],["الغولف","golf","⛳"],["الفورمولا 1","f1","🏎️"],["UFC","ufc","🥊"]] as const).map(([t,k,ic])=><a key={k} href={`/individual/${k}`} className="shrink-0 flex items-center gap-2 h-11 px-4 rounded-xl text-sm border border-line text-[#C9CCE0] hover:text-white hover:bg-hover"><span aria-hidden>{ic}</span>{t}</a>)]}</div>
+   <nav aria-label="الرياضات" className="flex gap-2 mb-4 overflow-x-auto scroll-x -mx-3 px-3 sm:mx-0 sm:px-0">{[...sports.map(([t,k,ic])=><a key={k} href={q({s:k})} aria-current={k===cur?"page":undefined} className={"sport-pill "+(k===cur?"on":"")}><span aria-hidden className="text-base">{ic}</span>{t}<span className="cnt tabular-nums">{counts.get(k)||0}</span></a>),...([["التنس","tennis","🎾"],["الغولف","golf","⛳"],["الفورمولا 1","f1","🏎️"],["UFC","ufc","🥊"]] as const).map(([t,k,ic])=><a key={k} href={`/individual/${k}`} className="sport-pill"><span aria-hidden className="text-base">{ic}</span>{t}</a>)]}</nav>
    {sample&&<div role="status" className="mb-4 rounded-xl border border-amber/40 bg-[#2A2110] text-amber text-sm px-4 py-3">مصدر البيانات غير متاح الآن، فهذه مباريات تجريبية للعرض فقط.</div>}
-   <div className="grid gap-5 lg:grid-cols-[230px_minmax(0,1fr)_320px]">
+   <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)_320px]">
     {/* العمود الأيمن: الدوريات */}
-    <aside className="hidden lg:block">
-     <div className={card+" p-2 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto"}>
-      <a href={q({})} className={"flex items-center justify-between px-3 h-10 rounded-lg text-sm "+(!sp.l&&!sp.live?"bg-hover text-white font-semibold":"text-[#C9CCE0] hover:bg-hover")}>كل الدوريات<span className="text-xs text-mute">{inSport.length}</span></a>
-      {liveAll>0&&<a href={q({live:"1"})} className={"flex items-center justify-between px-3 h-10 rounded-lg text-sm "+(sp.live?"bg-hover text-white font-semibold":"text-pink hover:bg-hover")}><span className="flex items-center gap-2"><i className="live-dot !mb-0"/>مباشر الآن</span><span className="text-xs">{liveAll}</span></a>}
+    <aside className="hidden lg:block" aria-label="الدوريات">
+     <div className="panel p-2 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto scroll-x">
+      <a href={q({})} className={"side-link justify-between "+(!sp.l&&!sp.live?"on":"")}>كل الدوريات<span className="text-xs text-mute tabular-nums">{inSport.length}</span></a>
+      {liveAll>0&&<a href={q({live:"1"})} className={"side-link justify-between !text-pink "+(sp.live?"on":"")}><span className="flex items-center gap-2"><i className="live-dot !mb-0"/>مباشر الآن</span><span className="text-xs tabular-nums">{liveAll}</span></a>}
       <div className="h-px bg-line my-2"/>
-      {leagues.map(([k,x])=><a key={k} href={q({l:k})} className={"flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] "+(sp.l===k?"bg-hover text-white font-semibold":"text-[#C9CCE0] hover:bg-hover hover:text-white")}>
+      {leagues.map(([k,x])=><a key={k} href={q({l:k})} className={"side-link "+(sp.l===k?"on":"")}>
         {x.logo?<img src={x.logo} alt="" width={20} height={20} loading="lazy" referrerPolicy="no-referrer" className="w-5 h-5 object-contain shrink-0"/>:<span className="w-5 h-5 rounded bg-line shrink-0"/>}
         <span className="flex-1 truncate">{x.name}</span>{x.live>0?<i className="live-dot !mb-0"/>:<span className="text-[11px] text-mute tabular-nums">{x.n}</span>}</a>)}
      </div>
     </aside>
-    {/* الوسط: المباريات */}
-    <section className="min-w-0">
-     <div className={card+" flex items-center gap-1 p-1 mb-4 overflow-x-auto scroll-x"}>
-      {days.map(d=><a key={d} href={q({d,l:sp.l})} className={"flex-1 min-w-[72px] text-center rounded-xl py-2 text-sm leading-5 "+(d===date?"bg-violet !text-[#0B0D14] font-semibold":"text-[#C9CCE0] hover:bg-hover")}>{d===today?"اليوم":d===algDate(-1)?"أمس":d===algDate(1)?"غدا":dayLabel(d)}<span className={"block text-[11px] "+(d===date?"!text-[#0B0D14]/60":"text-mute")}>{dayLabel(d)}</span></a>)}
-     </div>
-     {/* الدوريات على الهاتف */}
-     <div className="lg:hidden flex gap-2 mb-4 overflow-x-auto scroll-x">
-      {liveAll>0&&<a href={q({live:"1"})} className={"shrink-0 flex items-center gap-2 h-9 px-3 rounded-full text-sm border "+(sp.live?"border-pink text-pink":"border-line text-pink")}><i className="live-dot !mb-0"/>مباشر {liveAll}</a>}
-      {leagues.slice(0,20).map(([k,x])=><a key={k} href={q({l:k})} className={"shrink-0 flex items-center gap-2 h-9 px-3 rounded-full text-[13px] border "+(sp.l===k?"bg-white !text-[#0B0D14] border-white":"border-line text-[#C9CCE0]")}>{x.logo?<img src={x.logo} alt="" width={18} height={18} loading="lazy" referrerPolicy="no-referrer" className="w-[18px] h-[18px] object-contain"/>:null}<span className="max-w-[140px] truncate">{x.name}</span></a>)}
-     </div>
-     {/* البانر: مباراة اليوم */}
-     {top&&!sp.l&&!sp.live&&<a href={`/match/${encodeURIComponent(top.id)}`} className="pitch block rounded-2xl border border-line p-5 sm:p-7 mb-5 hover:border-violet/60">
-      <div className="flex items-center justify-between text-xs text-[#C9CCE0]"><span className="flex items-center gap-2">{top.leagueLogo?<img src={top.leagueLogo} alt="" width={18} height={18} referrerPolicy="no-referrer" className="w-[18px] h-[18px] object-contain"/>:null}{top.league}</span>
-       <span className="rounded-full bg-amber/15 text-amber px-3 py-1 font-semibold">{top.state==="live"?"مباشر الآن":"مباراة اليوم"}</span></div>
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 mt-5">
-       <div className="flex flex-col items-center gap-2 text-center min-w-0"><Crest name={top.home} size={64} logo={top.homeLogo}/><b className="text-white text-sm sm:text-base leading-6">{top.home}</b></div>
-       <div className="text-center">{top.score?<div className="font-display text-5xl text-white tabular-nums">{top.score[0]}-{top.score[1]}</div>:<div className="font-display text-4xl text-white tabular-nums">{new Date(top.kickoff).toLocaleTimeString("ar-DZ",{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Algiers"})}</div>}</div>
-       <div className="flex flex-col items-center gap-2 text-center min-w-0"><Crest name={top.away} size={64} logo={top.awayLogo}/><b className="text-white text-sm sm:text-base leading-6">{top.away}</b></div>
+    {/* الوسط */}
+    <section className="min-w-0" aria-label="المباريات">
+     {/* المسرح: مباراة اليوم */}
+     {top&&!sp.l&&!sp.live&&<article className="stage relative rounded-[22px] p-4 sm:p-7 mb-5 overflow-hidden">
+      <div className="relative flex items-center justify-between gap-3 text-xs text-[#C9CCE0]">
+       <span className="flex items-center gap-2 min-w-0">{top.leagueLogo?<img src={top.leagueLogo} alt="" width={18} height={18} referrerPolicy="no-referrer" className="w-[18px] h-[18px] object-contain"/>:null}<span className="truncate">{top.league}</span></span>
+       <span className={"shrink-0 rounded-full px-3 py-1 font-semibold "+(top.state==="live"?"bg-pink/15 text-pink":"bg-amber/15 text-amber")}>{top.state==="live"?"مباشر الآن":"مباراة اليوم"}</span>
       </div>
-      {top.probs&&<><div className="flex h-2 rounded-full overflow-hidden gap-[3px] mt-6"><i style={{width:top.probs.h+"%"}} className="bg-violet"/>{top.probs.d>0&&<i style={{width:top.probs.d+"%"}} className="bg-[#4A5273]"/>}<i style={{width:top.probs.a+"%"}} className="bg-pink"/></div>
-       <div className="flex justify-between text-xs text-[#C9CCE0] mt-2 tabular-nums"><span>{top.probs.h}%</span>{top.probs.d>0&&<span>تعادل {top.probs.d}%</span>}<span>{top.probs.a}%</span></div></>}
-      <div className="mt-5 text-center"><span className="inline-flex items-center h-11 px-6 rounded-xl bg-white !text-[#0B0D14] font-semibold text-sm">{top.state==="pre"?"اختم توقعك ضد الـ AI":"تابع المباراة"}</span></div>
-     </a>}
-     {ordered.length?<div className="flex flex-col gap-3">{ordered.map(([name,list])=><section key={name} className={card+" overflow-hidden"}>
-       <a href={list[0].slug&&list[0].slug!=="all"?`/league/${list[0].id.split("-")[0]}/${list[0].slug}`:q({l:name})} className="flex items-center gap-2.5 px-4 h-12 bg-[#0E1220] border-b border-line text-[14px] font-semibold text-white hover:text-violet">
-        {list[0].leagueLogo?<img src={list[0].leagueLogo} alt="" width={22} height={22} loading="lazy" referrerPolicy="no-referrer" className="w-[22px] h-[22px] object-contain"/>:null}<span className="flex-1 truncate">{name}</span><span className="text-xs text-mute font-normal">{list.length}</span></a>
-       <div className="px-2">{list.map(m=><MatchRow key={m.id} m={m}/>)}</div></section>)}</div>
-     :<p className={card+" text-mute p-10 text-center"}>ما كاين حتى ماتش هنا {date===today?"اليوم":"في هذا اليوم"}. جرّب يوم آخر ولا رياضة أخرى.</p>}
+      <div className="relative grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4 mt-5">
+       <div className="flex flex-col items-center gap-2.5 text-center min-w-0"><Crest name={top.home} size={72} logo={top.homeLogo}/><b className="text-white text-sm sm:text-base leading-6 line-clamp-2"><bdi>{top.home}</bdi></b>{top.homeRec&&<span className="text-[11px] text-mute tabular-nums" dir="ltr">{top.homeRec}</span>}</div>
+       <div className="text-center scoreboard px-3 sm:px-5 py-3 rounded-2xl">
+        {top.score?<><div className="font-display text-[44px] sm:text-6xl leading-none text-white tabular-nums" dir="ltr">{top.score[0]}<span className="text-mute mx-1.5">:</span>{top.score[1]}</div>{top.state==="live"&&<div className="mt-2 inline-flex items-center gap-1.5 text-pink text-xs font-semibold"><i className="live-dot !mb-0"/>{top.clock||"مباشر"}</div>}</>
+        :<><div className="font-display text-[34px] sm:text-5xl leading-none text-white tabular-nums">{tm(top.kickoff)}</div><div className="mt-2 text-[11px] text-mute">الصافرة بعد <Countdown to={top.kickoff} className="text-amber font-semibold tabular-nums"/></div></>}
+       </div>
+       <div className="flex flex-col items-center gap-2.5 text-center min-w-0"><Crest name={top.away} size={72} logo={top.awayLogo}/><b className="text-white text-sm sm:text-base leading-6 line-clamp-2"><bdi>{top.away}</bdi></b>{top.awayRec&&<span className="text-[11px] text-mute tabular-nums" dir="ltr">{top.awayRec}</span>}</div>
+      </div>
+      {tp&&tpk&&<div className="relative mt-6 flex items-center gap-4 rounded-2xl bg-[#090C16]/70 border border-white/5 p-3 sm:p-4">
+       <ProbRing h={tp.h} d={tp.d} a={tp.a} size={84} label={tlabel} pct={tp[tpk]}/>
+       <div className="flex-1 min-w-0">
+        <p className="text-[13px] text-[#C9CCE0]">الـ AI ختم: <b className="text-white"><bdi>{tlabel}</bdi></b></p>
+        <div className="flex h-2 rounded-full overflow-hidden gap-[3px] mt-2.5" aria-hidden><i style={{width:tp.h+"%"}} className="bg-violet"/>{tp.d>0&&<i style={{width:tp.d+"%"}} className="bg-[#4A5273]"/>}<i style={{width:tp.a+"%"}} className="bg-pink"/></div>
+        <div className="flex justify-between text-[11px] text-mute mt-1.5 tabular-nums"><span>{tp.h}%</span>{tp.d>0&&<span>تعادل {tp.d}%</span>}<span>{tp.a}%</span></div>
+        {vs&&<p className="text-[11px] text-mute mt-2">هذا الأسبوع: البشر <b className="text-pink tabular-nums" dir="ltr">{vs.humans}%</b> ضد الآلة <b className="text-violet tabular-nums" dir="ltr">{vs.ai}%</b>. نتا مع شكون؟</p>}
+       </div>
+      </div>}
+      <div className="relative mt-5 flex items-center justify-center gap-3">
+       <a href={`/match/${encodeURIComponent(top.id)}`} className="cta btn inline-flex items-center gap-2 h-12 px-7 rounded-2xl font-semibold text-[15px]">{top.state==="pre"?"اختم توقعك":"تابع المباراة"}<span aria-hidden>←</span></a>
+       {top.state==="pre"&&<Seal size={48} className="seal">مختوم</Seal>}
+      </div>
+     </article>}
+     {/* شريط المباشر */}
+     {liveList.length>0&&!sp.live&&<section className="mb-5" aria-labelledby="live-h">
+      <div className="flex items-center justify-between mb-2.5"><h2 id="live-h" className="flex items-center gap-2 text-[15px] font-semibold text-white"><i className="live-dot !mb-0"/>مباشر الآن <span className="text-mute text-xs font-normal tabular-nums">{liveList.length}</span></h2><a href={q({live:"1"})} className="text-xs text-violet hover:text-white min-h-11 inline-flex items-center">كل المباشر</a></div>
+      <LiveTicker>{liveList.slice(0,12).map(m=><a role="listitem" key={m.id} href={`/match/${encodeURIComponent(m.id)}`} className="tick-card snap-start shrink-0 w-[236px] rounded-2xl p-3">
+        <div className="flex items-center justify-between text-[11px] text-mute gap-2"><span className="truncate">{m.league}</span><span className="text-pink font-semibold tabular-nums shrink-0"><bdi dir="ltr">{m.clock||"مباشر"}</bdi></span></div>
+        {[[m.home,m.homeLogo,m.score?.[0]],[m.away,m.awayLogo,m.score?.[1]]].map(([n,l,g],i)=><div key={i} className="flex items-center gap-2 mt-2"><Crest name={n as string} size={22} logo={l as string|null}/><span className="flex-1 truncate text-[13px] text-white"><bdi>{n as string}</bdi></span><b className="font-display text-xl leading-none text-white tabular-nums">{g as number??"-"}</b></div>)}
+      </a>)}</LiveTicker>
+     </section>}
+     {/* شريط الأيام */}
+     <nav aria-label="الأيام" className="panel flex items-center gap-1 p-1 mb-3 overflow-x-auto scroll-x">
+      {days.map(d=><a key={d} href={q({d,l:sp.l})} aria-current={d===date?"date":undefined} className={"day-tab "+(d===date?"on":"")}>{d===today?"اليوم":d===algDate(-1)?"أمس":d===algDate(1)?"غدا":dayLabel(d).split(" ")[0]}<span className="block text-[11px] opacity-70 tabular-nums">{dayLabel(d)}</span></a>)}
+     </nav>
+     {/* الدوريات على الهاتف */}
+     <div className="lg:hidden flex gap-2 mb-3 overflow-x-auto scroll-x -mx-3 px-3">
+      {liveAll>0&&<a href={q({live:"1"})} className={"chip !text-pink "+(sp.live?"on-pink":"")}><i className="live-dot !mb-0"/>مباشر <span className="tabular-nums">{liveAll}</span></a>}
+      {leagues.slice(0,20).map(([k,x])=><a key={k} href={q({l:k})} className={"chip "+(sp.l===k?"on":"")}>{x.logo?<img src={x.logo} alt="" width={18} height={18} loading="lazy" referrerPolicy="no-referrer" className="w-[18px] h-[18px] object-contain"/>:null}<span className="max-w-[140px] truncate">{x.name}</span></a>)}
+     </div>
+     {ordered.length?<div className="flt">
+      {/* فلتر سريع بلا جافاسكريبت */}
+      <fieldset className="seg mb-3"><legend className="sr-only">صفّي المباريات</legend>
+       {([["all","الكل",ms.length],["live","مباشر",st.live],["pre","الجاية",st.pre],["post","انتهت",st.post]] as const).map(([k,t,n],i)=><span key={k} className="contents"><input type="radio" name="f" id={"f-"+k} defaultChecked={i===0} className="sr-only"/><label htmlFor={"f-"+k}>{t}<span className="tabular-nums">{n}</span></label></span>)}
+      </fieldset>
+      <div className="flex flex-col gap-3">{ordered.map(([name,list],gi)=><details key={name} open={gi<10} className="lgroup panel overflow-hidden">
+       <summary className="lg-head flex items-center gap-2.5 ps-4 pe-2 h-12 cursor-pointer select-none">
+        {list[0].leagueLogo?<img src={list[0].leagueLogo} alt="" width={22} height={22} loading="lazy" referrerPolicy="no-referrer" className="w-[22px] h-[22px] object-contain"/>:<span className="w-[22px] h-[22px] rounded bg-line"/>}
+        <span className="flex-1 truncate text-[14px] font-semibold text-white">{name}</span>
+        {list.some(m=>m.state==="live")&&<i className="live-dot !mb-0"/>}
+        <span className="text-xs text-mute tabular-nums">{list.length}</span>
+        <a href={list[0].slug&&list[0].slug!=="all"?`/league/${list[0].id.split("-")[0]}/${list[0].slug}`:q({l:name})} className="text-[11px] text-violet hover:text-white px-2 min-h-11 inline-flex items-center">الدوري</a>
+        <span aria-hidden className="chev"/>
+       </summary>
+       <div className="p-1.5 flex flex-col">{list.map(m=><MatchRow key={m.id} m={m}/>)}</div>
+       <p className="empty-note text-xs text-mute px-4 pb-3">ما كاين حتى ماتش في هذا الفلتر.</p>
+      </details>)}</div>
+     </div>
+     :<p className="panel text-mute p-10 text-center leading-7">ما كاين حتى ماتش هنا {date===today?"اليوم":"في هذا اليوم"}. جرّب يوم آخر ولا رياضة أخرى.</p>}
     </section>
     {/* العمود الأيسر */}
-    <aside className="flex flex-col gap-4 lg:sticky lg:top-20 self-start">
+    <aside className="flex flex-col gap-4 lg:sticky lg:top-20 self-start" aria-label="المنافسة">
      {vs&&<VersusBar v={vs}/>}
-     <div className={card+" p-5"}>
-      <div className="flex items-center justify-between mb-3"><h2 className="font-semibold text-white">أقوى المتوقعين</h2><a href="/leaders" className="text-xs text-violet">الكل</a></div>
-      {leaders&&leaders.length?<ol className="flex flex-col">{leaders.slice(0,5).map((x,i)=><li key={x.nick} className="flex items-center gap-3 py-2.5 border-t border-line first:border-0">
-        <span className={"w-7 h-7 rounded-full grid place-items-center text-xs font-bold "+(i===0?"bg-amber text-[#0B0D14]":"bg-line text-white")}>{i+1}</span>
-        <a href={`/u/${encodeURIComponent(x.nick)}`} className="flex-1 truncate text-sm text-white hover:text-violet">{x.nick}</a>
-        <span className="text-xs text-mute tabular-nums">{x.hits}/{x.n} · <b className="text-white">{x.points}</b></span></li>)}</ol>
+     <section className="panel p-5" aria-labelledby="ld-h">
+      <div className="flex items-center justify-between mb-2"><h2 id="ld-h" className="text-[15px] font-semibold text-white">أقوى المتوقعين</h2><a href="/leaders" className="text-xs text-violet hover:text-white min-h-11 inline-flex items-center">الترتيب كامل</a></div>
+      {leaders&&leaders.length?<ol className="flex flex-col">{leaders.slice(0,5).map((x,i)=><li key={x.nick}>
+        <a href={`/u/${encodeURIComponent(x.nick)}`} className="flex items-center gap-3 py-2 px-2 -mx-2 rounded-xl hover:bg-hover min-h-11">
+        {i<3?<span className="medal" style={{["--m" as string]:medals[i]}}>{i+1}</span>:<span className="w-7 h-7 rounded-full grid place-items-center text-xs font-bold bg-line text-[#C9CCE0] tabular-nums">{i+1}</span>}
+        <span className="flex-1 truncate text-sm text-white"><bdi>{x.nick}</bdi></span>
+        <span className="text-xs text-mute tabular-nums" dir="ltr">{x.hits}/{x.n}</span><b className="text-sm text-amber tabular-nums w-10 text-end">{x.points}</b></a></li>)}</ol>
       :<p className="text-sm text-mute leading-7">الترتيب يتعمّر كي تنتهي المباريات المختومة هذا الأسبوع. كن الأول.</p>}
-     </div>
-     <div className={card+" p-5"}>
-      <h2 className="font-semibold text-white">كيفاش تلعب</h2>
-      <ol className="mt-3 flex flex-col gap-3 text-sm text-[#C9CCE0] leading-6">
-       <li className="flex gap-3"><b className="text-amber">1</b>اختار مباراة واختم توقعك قبل الصافرة.</li>
-       <li className="flex gap-3"><b className="text-amber">2</b>الـ AI يختم توقعو تاني، وبصمتو تبان للكل.</li>
-       <li className="flex gap-3"><b className="text-amber">3</b>كي تنتهي، تتحسب النقاط وتطلع النجوم في بروفايلك.</li>
+     </section>
+     <section className="panel p-5" aria-labelledby="how-h">
+      <h2 id="how-h" className="text-[15px] font-semibold text-white">كيفاش تلعب</h2>
+      <ol className="steps mt-4 flex flex-col gap-4 text-[13px] text-[#C9CCE0] leading-6">
+       <li><b>1</b>اختار مباراة واختم توقعك قبل الصافرة.</li>
+       <li><b>2</b>الـ AI يختم توقعو تاني، وبصمتو تبان للكل.</li>
+       <li><b>3</b>كي تنتهي، تتحسب النقاط وتطلع في الترتيب.</li>
       </ol>
-      <p className="text-xs text-mute mt-4">للتوقعات فقط. بلا رهان، بلا دراهم.</p>
-     </div>
+      <p className="text-[11px] text-mute mt-4">للتوقعات فقط. بلا رهان، بلا دراهم.</p>
+     </section>
+     <a href="/groups" className="invite panel block p-5 relative overflow-hidden">
+      <Seal size={54} className="absolute top-4 end-4 rotate-[-8deg]">صحاب</Seal>
+      <h2 className="text-[15px] font-semibold text-white">دير دوري مع صحابك</h2>
+      <p className="text-[13px] text-[#C9CCE0] mt-1.5 leading-6 max-w-[200px]">ابعث الرابط، وشوفو شكون فيكم يغلب الآلة.</p>
+      <span className="mt-4 inline-flex items-center h-11 px-5 rounded-xl bg-white text-[#0B0D14] text-sm font-semibold">عيّط لصحابك</span>
+     </a>
     </aside>
    </div>
   </>);
