@@ -3,14 +3,17 @@ import {NextResponse} from "next/server";
 import {dbRaw} from "@/lib/db";
 import {cookies} from "next/headers";
 import {COOKIE,cookieOpts,cookieValue,newCode,nickOk,sha256,turnstileOk,unsignVal} from "@/lib/auth";
+import {limit,ipKey,TOO_MANY} from "@/lib/ratelimit";
 import {GP} from "@/lib/google";
 export async function POST(req:Request){
+  if(!await limit(ipKey("register",req),3600,5))return NextResponse.json({error:"rate",msg:TOO_MANY},{status:429});
   const b:any=await req.json().catch(()=>null);
   if(!b)return NextResponse.json({error:"bad"},{status:400});
   if(b.website)return NextResponse.json({error:"bad"},{status:400}); // فخ للبوتات
   const nick=String(b.nick||"").trim();
   if(!nickOk(nick))return NextResponse.json({error:"nick",msg:"الاسم من 3 إلى 20 حرف: حروف وأرقام و_ فقط."},{status:400});
   if(!b.adult)return NextResponse.json({error:"adult",msg:"لازم تؤكد أنك بلغت 18 سنة وتوافق على الشروط."},{status:400});
+  // TODO(owner): اضبط TURNSTILE_SECRET في الإنتاج. حاليا إذا ناقص (حتى مع NODE_ENV=production) التسجيل يبقى مسموح باش ما نكسروش التسجيلات.
   if(!await turnstileOk(b.token,req.headers.get("CF-Connecting-IP")||undefined))
     return NextResponse.json({error:"captcha",msg:"فشل التحقق، أعد المحاولة."},{status:400});
   const gh=b.google?await unsignVal((await cookies()).get(GP)?.value):null;
