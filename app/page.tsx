@@ -1,3 +1,4 @@
+import TrustLine from "@/components/ledger/TrustLine";
 import {getDay,isDate} from "@/lib/day";
 import MatchRow from "@/components/MatchRow";
 import VersusBar from "@/components/VersusBar";
@@ -50,6 +51,7 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
   const medals=["#FFB020","#C8CEDD","#C98A55"];
   return(<>
    <LiveRefresh on={liveAll>0}/>
+   <TrustLine lang={lang}/>
    <span hidden data-live-count={liveAll}/>
    {/* الرياضات */}
    <nav aria-label={t(lang,"h.sports")} className="flex gap-2 mb-4 overflow-x-auto scroll-x -mx-3 px-3 sm:mx-0 sm:px-0">{[...sports.map(([tk,k,ic])=><a key={k} href={q({s:k})} aria-current={k===cur?"page":undefined} className={"sport-pill "+(k===cur?"on":"")}><span aria-hidden className="text-base">{ic}</span>{t(lang,tk)}<span className="cnt tabular-nums">{counts.get(k)||0}</span></a>),...([[t(lang,"sp.tennis"),"tennis","🎾"],[t(lang,"sp.golf"),"golf","⛳"],[t(lang,"sp.f1"),"f1","🏎️"],["UFC","ufc","🥊"]] as const).map(([tt,k,ic])=><a key={k} href={`/individual/${k}`} className="sport-pill"><span aria-hidden className="text-base">{ic}</span>{tt}</a>)]}</nav>

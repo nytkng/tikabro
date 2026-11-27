@@ -249,6 +249,26 @@ const D={
  "i.empty":{ar:"ما كاين والو هنا دركا، ارجع من بعد.",fr:"Rien pour l'instant, reviens plus tard.",en:"Nothing here yet, check back later."},
  "i.home":{ar:"المستقبل",fr:"domicile",en:"home"},
  "i.away":{ar:"الضيف",fr:"extérieur",en:"away"},
+ // سجل التوقعات المتسلسل
+ "ledger.trust":{ar:"كل توقع يتختم قبل الماتش في سلسلة مشفّرة — مستحيل يتبدّل. تحقّق بنفسك ←",fr:"Chaque pronostic est scellé avant le match dans une chaîne chiffrée — impossible à modifier. Vérifie toi-même →",en:"Every prediction is sealed before kickoff in a cryptographic chain — it can't be changed. Verify it yourself →"},
+ "ledger.title":{ar:"تحقّق بنفسك: سلسلة التوقعات",fr:"Vérifie toi-même : la chaîne des pronostics",en:"Verify it yourself: the prediction chain"},
+ "ledger.p1":{ar:"كي يخرج توقع جديد، نكتبوه في سطر واحد (الماتش، الفرق، الاحتمالات، الوقت) ونحسبولو بصمة sha256.",fr:"Chaque nouveau pronostic est écrit sur une ligne (match, équipes, probabilités, heure) et reçoit une empreinte sha256.",en:"Each new prediction is written as one line (match, teams, probabilities, time) and gets a sha256 fingerprint."},
+ "ledger.p2":{ar:"البصمة تتحسب من السطر + بصمة التوقع اللي قبلو. إذا تبدّل حرف واحد في توقع قديم، كل البصمات من بعدو يتكسرو.",fr:"L'empreinte combine la ligne et l'empreinte du pronostic précédent. Changer un seul caractère casse toute la suite.",en:"The fingerprint combines the line with the previous one's fingerprint. Changing one character breaks everything after it."},
+ "ledger.p3":{ar:"كل نهار، آخر بصمة تتختم في بلوكشين بيتكوين عبر OpenTimestamps، باش حتى حنا ما نقدروش نبدّلو التاريخ.",fr:"Chaque jour, la dernière empreinte est horodatée dans Bitcoin via OpenTimestamps : même nous ne pouvons pas réécrire l'historique.",en:"Every day the latest fingerprint is timestamped in Bitcoin via OpenTimestamps, so not even we can rewrite history."},
+ "ledger.ph":{ar:"رقم الماتش ولا البصمة (64 حرف)",fr:"ID du match ou empreinte (64 caractères)",en:"Match ID or hash (64 chars)"},
+ "ledger.go":{ar:"تحقّق",fr:"Vérifier",en:"Verify"},
+ "ledger.none":{ar:"ما لقيناش هذا في السلسلة.",fr:"Introuvable dans la chaîne.",en:"Not found in the chain."},
+ "ledger.before":{ar:"مختوم قبل البداية بـ {m} دقيقة",fr:"Scellé {m} min avant le coup d'envoi",en:"Sealed {m} min before kickoff"},
+ "ledger.after":{ar:"مختوم بعد البداية بـ {m} دقيقة",fr:"Scellé {m} min après le coup d'envoi",en:"Sealed {m} min after kickoff"},
+ "ledger.calc":{ar:"البصمة محسوبة دركا في متصفحك:",fr:"Empreinte recalculée dans ton navigateur :",en:"Hash recomputed in your browser:"},
+ "ledger.ok":{ar:"مطابقة — التوقع ما تبدّلش",fr:"Identique — le pronostic n'a pas changé",en:"Match — the prediction is unchanged"},
+ "ledger.bad":{ar:"ما تطابقش!",fr:"Ne correspond pas !",en:"Does not match!"},
+ "ledger.prev":{ar:"← شوف التوقع اللي قبلو في السلسلة",fr:"← Voir l'entrée précédente",en:"← See the previous entry"},
+ "ledger.recent":{ar:"آخر التوقعات المختومة",fr:"Derniers pronostics scellés",en:"Latest sealed predictions"},
+ "ledger.roots":{ar:"الجذور اليومية",fr:"Racines quotidiennes",en:"Daily roots"},
+ "ledger.ots":{ar:"حمّل الملفين .txt و .ots وارفعهم في",fr:"Télécharge les fichiers .txt et .ots et dépose-les sur",en:"Download the .txt and .ots files and drop them on"},
+ "ledger.noroots":{ar:"ما كاين حتى جذر دركا.",fr:"Aucune racine pour l'instant.",en:"No roots yet."},
+ "ledger.pending":{ar:"قيد الختم",fr:"en attente",en:"pending"},
 } satisfies Record<string,E>;
 export type Key=keyof typeof D;
 export function t(l:Lang,k:Key,v?:Record<string,string|number>):string{

@@ -10,5 +10,5 @@ export const viewport:Viewport={themeColor:"#0B0D14",width:"device-width",initia
 export default async function Root({children}:{children:React.ReactNode}){
   const lang=await getLang();
   return(<html lang={lang} dir={dirOf(lang)}><body><Header/><main className="mx-auto max-w-[1320px] px-3 sm:px-6 py-5 pb-20">{children}</main>
-  <footer className="border-t border-line text-mute text-sm px-4 sm:px-10 py-8 text-center leading-8">{t(lang,"footer.note")} <a className="underline" href="/legal">{t(lang,"footer.legal")}</a></footer><InstallPrompt/></body></html>);
+  <footer className="border-t border-line text-mute text-sm px-4 sm:px-10 py-8 text-center leading-8">{t(lang,"footer.note")} <a className="underline" href="/legal">{t(lang,"footer.legal")}</a><span className="block text-xs mt-2 space-x-3 space-x-reverse"><a className="underline" href="/verify">التحقق من الأختام</a><a className="underline" href="/data">البيانات المفتوحة</a><a className="underline" href="/changelog">سجل تطوير الـ AI</a><a className="underline" href="/learn">علاش غلط الـ AI</a><a className="underline" href="/creator">للبث</a></span></footer><InstallPrompt/></body></html>);
 }
