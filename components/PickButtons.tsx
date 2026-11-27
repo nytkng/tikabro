@@ -1,14 +1,16 @@
 "use client";
 import {useState} from "react";
+import {useRouter} from "next/navigation";
 type K="home"|"draw"|"away";
 export default function PickButtons({matchId,home,away,hasDraw,current}:{matchId:string;home:string;away:string;hasDraw:boolean;current:K|null}){
+  const router=useRouter();
   const [cur,setCur]=useState<K|null>(current),[busy,setBusy]=useState<K|null>(null),[msg,setMsg]=useState("");
   async function go(k:K){
     setBusy(k);setMsg("");
     try{
       const r=await fetch("/api/pick",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({matchId,pick:k})});
       const j=await r.json().catch(()=>({}));
-      if(r.ok){setCur(k);setMsg("تم ختم توقعك ✓ تقدر تبدلو قبل البداية.")}else setMsg(j.msg||"صار خطأ.");
+      if(r.ok){setCur(k);setMsg("تم ختم توقعك ✓ تقدر تبدلو قبل البداية.");router.refresh()}else setMsg(j.msg||"صار خطأ.");
     }catch{setMsg("تعذّر الاتصال.")}
     setBusy(null);
   }

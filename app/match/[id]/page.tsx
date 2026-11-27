@@ -5,6 +5,7 @@ import {currentPlayer} from "@/lib/auth";
 import {db} from "@/lib/db";
 import Markets from "@/components/Markets";
 import PickButtons from "@/components/PickButtons";
+import CrowdVsAI from "@/components/CrowdVsAI";
 export default async function MatchPage({params}:{params:Promise<{id:string}>}){
   const {id}=await params;const key=decodeURIComponent(id);
   const date=new Date().toLocaleDateString("en-CA",{timeZone:"Africa/Algiers"});
@@ -20,6 +21,11 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
   const pp=sealRow&&m.sport==="football"?{h:sc(sealRow.p_home),d:sc(sealRow.p_draw),a:100-sc(sealRow.p_home)-sc(sealRow.p_draw)}:p;
   const pk2=pp?pickOf(pp):null;
   const sealed=!!sealRow;
+  type K="home"|"draw"|"away";
+  const rows=m.sample?null:await db<{pick:K}[]>(`picks?match_id=eq.${eid}&void=not.is.true&select=pick&limit=10000`);
+  const counts:Record<K,number>={home:0,draw:0,away:0};for(const r of rows||[])if(r.pick in counts)counts[r.pick]++;
+  const aiK:K|null=pk2==="h"?"home":pk2==="a"?"away":pk2==="d"?"draw":null;
+  const outcome:K|null=m.state==="post"&&m.score?(m.score[0]>m.score[1]?"home":m.score[0]<m.score[1]?"away":"draw"):null;
   return(<div className="flex flex-col gap-6">
    <section className="rounded-[20px] bg-surface border border-line p-7 flex flex-wrap items-center justify-between gap-6">
     <div className="flex items-center gap-4"><Crest name={m.home} size={64}/><span className="text-2xl font-bold text-white">{m.home}</span></div>
@@ -37,6 +43,7 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
     :me?<><p className="text-sm text-mute mb-4">اختر قبل البداية. يُختم باسمك <b className="text-white">{me.nick}</b> وتقدر تبدلو لحد الصافرة.</p><PickButtons matchId={key} home={m.home} away={m.away} hasDraw={m.sport==="football"} current={mine}/></>
     :<><p className="text-sm text-mute mb-4">سجّل الدخول لتختم توقعك قبل البداية.</p><a href="/login" className="btn inline-flex items-center px-6 rounded-xl bg-violet text-bg font-semibold">دخول لتختم توقعك</a></>}
    </section>
+   {!m.sample&&<CrowdVsAI home={m.home} away={m.away} hasDraw={m.sport==="football"} counts={counts} ai={aiK} mine={mine} revealed={!!mine||!open} outcome={outcome}/>}
    {m.ext&&<Markets x={m.ext} home={m.home} away={m.away}/>}
   </div>);
 }
