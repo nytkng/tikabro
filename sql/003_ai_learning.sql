@@ -17,7 +17,7 @@ grant select, insert, update, delete on public.team_ratings, public.model_weight
 -- 1) التعلّم من النتائج: Elo مع أفضلية الأرض وفارق الأهداف
 create or replace function public.hadaf_learn(p_limit int default 3000) returns int
 language plpgsql security definer set search_path=public as $$
-declare m record; kh text; ka text; rh float; ra float; adv float; e float; s float; k float; mult float; n int:=0;
+declare m record; kh text; ka text; rh float; ra float; adv float; e float; s float; k float; mult float; cnt int:=0;
 begin
   for m in select * from matches where state='post' and not coalesce(processed,false) and score_h is not null and score_a is not null
            and home_id is not null and away_id is not null order by kickoff limit p_limit loop
@@ -29,12 +29,12 @@ begin
     e:=1/(1+power(10,(ra-rh-adv)/400.0));
     s:=case when m.score_h>m.score_a then 1 when m.score_h<m.score_a then 0 else 0.5 end;
     mult:=case when m.sport='soccer' then ln(abs(m.score_h-m.score_a)+1)+1 else least(2.0,ln(abs(m.score_h-m.score_a)+1)/2+0.6) end;
-    update team_ratings set elo=elo+k*mult*(s-e),n=n+1,updated_at=now() where key=kh;
-    update team_ratings set elo=elo-k*mult*(s-e),n=n+1,updated_at=now() where key=ka;
+    update team_ratings set elo=elo+k*mult*(s-e),n=team_ratings.n+1,updated_at=now() where key=kh;
+    update team_ratings set elo=elo-k*mult*(s-e),n=team_ratings.n+1,updated_at=now() where key=ka;
     update matches set processed=true where id=m.id;
-    n:=n+1;
+    cnt:=cnt+1;
   end loop;
-  return n;
+  return cnt;
 end $$;
 
 -- 2) الاحتمالات: Elo + سجل الموسم + الجمهور (بالوزن اللي تعلّمو النموذج لهذا الدوري)
