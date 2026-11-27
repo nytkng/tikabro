@@ -3,13 +3,13 @@ import {db} from "./db";
 import {predict,predictTwoWay,type Rec} from "./model";
 import type {Match,Sport} from "./types";
 export type Row={id:string;eid:string;sport:string;slug:string|null;league_name:string|null;league_logo:string|null;kickoff:string;state:string|null;detail:string|null;clock:string|null;home:string;away:string;home_logo:string|null;away_logo:string|null;home_rec:string|null;away_rec:string|null;score_h:number|null;score_a:number|null};
-const SPORT:Record<string,Sport>={soccer:"football",basketball:"basketball",hockey:"hockey",football:"american",baseball:"baseball"};
+const SPORT:Record<string,Sport>={soccer:"football",basketball:"basketball",hockey:"hockey",football:"american",baseball:"baseball",rugby:"rugby","rugby-league":"rugby",volleyball:"volleyball","australian-football":"aussie"};
 const rec=(s:string|null):Rec|null=>{if(!s||!/^\d+(-\d+){1,2}$/.test(s))return null;const a=s.split("-").map(Number);return a.length===3?{w:a[0],d:a[1],l:a[2]}:{w:a[0],d:0,l:a[1]}};
 export const COLS="id,eid,sport,slug,league_name,league_logo,kickoff,state,detail,clock,home,away,home_logo,away_logo,home_rec,away_rec,score_h,score_a";
 export function toMatch(r:Row):Match{
   const sport=SPORT[r.sport]||"football",h=rec(r.home_rec),a=rec(r.away_rec);
   const n=(x:Rec|null)=>x?x.w+x.d+x.l:0;
-  const probs=h&&a&&n(h)>0&&n(a)>0?(sport==="football"?predict(h,a):predictTwoWay(h,a)):undefined;
+  const probs=h&&a&&n(h)>0&&n(a)>0?(sport==="football"||sport==="rugby"?predict(h,a):predictTwoWay(h,a)):undefined;
   const st=r.state==="in"?"live":r.state==="post"?"post":"pre";
   return {id:`${r.sport}-${r.slug||"all"}:${r.eid}`,sport,league:r.league_name||"",slug:r.slug||"all",home:r.home,away:r.away,kickoff:r.kickoff,state:st,
     score:st!=="pre"&&r.score_h!==null&&r.score_a!==null?[r.score_h,r.score_a]:undefined,probs,source:"espn",

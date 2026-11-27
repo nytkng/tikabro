@@ -67,11 +67,11 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
    <section className="rounded-2xl bg-card border border-line p-7"><h2 className="text-lg font-semibold text-white mb-1">توقعك</h2>
     {m.sample?<p className="text-sm text-mute">مباراة تجريبية، ما فيها ختم.</p>
     :!open?<p className="text-sm text-mute">{mine?`توقعك المختوم: ${mine==="home"?"فوز "+m.home:mine==="away"?"فوز "+m.away:"تعادل"}. `:""}التوقعات مقفولة لأن المباراة بدأت.</p>
-    :me?<><p className="text-sm text-mute mb-4">اختر قبل البداية. يُختم باسمك <b className="text-white">{me.nick}</b> وتقدر تبدلو لحد الصافرة.</p><PickButtons matchId={key} home={m.home} away={m.away} hasDraw={m.sport==="football"} current={mine}/>
+    :me?<><p className="text-sm text-mute mb-4">اختر قبل البداية. يُختم باسمك <b className="text-white">{me.nick}</b> وتقدر تبدلو لحد الصافرة.</p><PickButtons matchId={key} home={m.home} away={m.away} hasDraw={["football","rugby","aussie"].includes(m.sport)} current={mine}/>
       {mine&&<ShareCard nick={me.nick} home={m.home} away={m.away} mine={mine==="home"?`فوز ${m.home}`:mine==="away"?`فوز ${m.away}`:"تعادل"} ai={aiK==="home"?`فوز ${m.home}`:aiK==="away"?`فوز ${m.away}`:aiK==="draw"?"تعادل":null} aiPct={pp?(aiK==="home"?pp.h:aiK==="away"?pp.a:pp.d):null} kickoff={m.kickoff} url={url}/>}</>
     :<><p className="text-sm text-mute mb-4">سجّل الدخول لتختم توقعك قبل البداية.</p><a href="/login" className="btn inline-flex items-center px-6 rounded-xl bg-violet text-bg font-semibold">دخول لتختم توقعك</a></>}
    </section>
-   {!m.sample&&<CrowdVsAI home={m.home} away={m.away} hasDraw={m.sport==="football"} counts={counts} ai={aiK} mine={mine} revealed={!!mine||!open} outcome={outcome}/>}
+   {!m.sample&&<CrowdVsAI home={m.home} away={m.away} hasDraw={["football","rugby","aussie"].includes(m.sport)} counts={counts} ai={aiK} mine={mine} revealed={!!mine||!open} outcome={outcome}/>}
    {!m.sample&&<MatchCentre id={key}/>}
    {m.ext&&<Markets x={m.ext} home={m.home} away={m.away}/>}
   </div>);
