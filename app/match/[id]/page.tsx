@@ -106,7 +106,7 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
     </div>
    </section>
    <nav id="tabs" aria-label={t(lang,"viz.tabs")} className="p-1 bg-card grid grid-cols-4 gap-1 rounded-xl border border-line">
-    {TABS.map(x=><a key={x} href={tabHref(x)} aria-current={tab===x?"page":undefined} className={"min-h-[44px] grid place-items-center rounded-lg text-[13px] font-semibold "+(tab===x?"bg-ink text-bg":"text-mute hover:text-white hover:bg-hover")}>{t(lang,("viz.tab_"+x) as Key)}</a>)}
+    {TABS.map(x=><a key={x} href={tabHref(x)} aria-current={tab===x?"page":undefined} className={"min-h-[44px] grid place-items-center rounded-lg text-[13px] font-semibold "+(tab===x?"bg-white !text-[#0B0D14]":"text-mute hover:text-white hover:bg-hover")}>{t(lang,("viz.tab_"+x) as Key)}</a>)}
    </nav>
    {tab==="pred"&&<>
    {pp?<section className="panel relative overflow-hidden p-5 sm:p-6">

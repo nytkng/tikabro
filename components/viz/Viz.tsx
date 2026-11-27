@@ -18,7 +18,7 @@ const FC:Record<string,string>={W:"bg-teal text-bg",D:"bg-[#4A5273] text-white",
 export function FormBoxes({f,lang,size="sm"}:{f?:string|null;lang:Lang;size?:"sm"|"md"}){
   const s=(f||"").toUpperCase().replace(/[^WDL]/g,"").slice(0,5);if(!s)return null;
   const txt=[...s].map(c=>t(lang,("viz."+c) as "viz.W")).join(" ");
-  const box=size==="md"?"w-7 h-7 text-sm rounded-lg":"w-[15px] h-[15px] text-[9px] rounded-[4px]";
+  const box=size==="md"?"w-[22px] h-[22px] sm:w-7 sm:h-7 text-[11px] sm:text-sm rounded-md":"w-[15px] h-[15px] text-[9px] rounded-[4px]";
   return <span role="img" aria-label={t(lang,"viz.form_of",{f:txt})} className="inline-flex gap-[3px] shrink-0" dir="ltr">
     {[...s].map((c,i)=><i key={i} aria-hidden className={"not-italic font-bold leading-none grid place-items-center "+box+" "+FC[c]}>{t(lang,("viz."+c) as "viz.W")}</i>)}</span>;
 }
