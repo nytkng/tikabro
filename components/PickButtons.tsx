@@ -14,8 +14,11 @@ export default function PickButtons({matchId,home,away,hasDraw,current}:{matchId
     }catch{setMsg("تعذّر الاتصال.")}
     setBusy(null);
   }
-  const opts:[K,string,string][]=[["home","فوز "+home,"bg-violet"],...(hasDraw?[["draw","تعادل","bg-[#4A5273]"] as [K,string,string]]:[]),["away","فوز "+away,"bg-pink"]];
-  return(<div><div className="grid gap-2.5 sm:grid-flow-col sm:auto-cols-fr">{opts.map(([k,t,c])=>
-    <button key={k} onClick={()=>go(k)} disabled={!!busy} className={"btn min-h-12 rounded-xl px-4 py-2 font-semibold text-center leading-6 transition "+(cur===k?`${c} text-white ring-2 ring-white/70`:"border border-line text-white hover:bg-white/5")+(busy===k?" opacity-60":"")}>{cur===k&&"✓ "}{t}</button>)}</div>
+  const opts:[K,string,string][]=[["home","فوز "+home,"from-[#9C8FFF] to-[#7565F0]"],...(hasDraw?[["draw","تعادل","from-[#5A6388] to-[#434B6C]"] as [K,string,string]]:[]),["away","فوز "+away,"from-[#F08DB5] to-[#D9638F]"]];
+  return(<div><div role="radiogroup" aria-label="توقعك" className="seg !gap-1.5 !p-1.5 !rounded-2xl">{opts.map(([k,t,c])=>{const on=cur===k;
+    return <button key={k} role="radio" aria-checked={on} onClick={()=>go(k)} disabled={!!busy}
+      className={"relative flex-1 min-w-0 min-h-[60px] rounded-xl px-2 py-2 text-[14px] font-semibold leading-5 text-center transition-[transform,background,box-shadow] duration-150 active:scale-[.95] active:translate-y-px motion-reduce:transform-none "+(on?`bg-gradient-to-b ${c} text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,.8),inset_0_1px_0_rgba(255,255,255,.35)]`:"text-[#C9CCE0] hover:bg-white/5 shadow-[inset_0_-2px_0_rgba(0,0,0,.35)] bg-white/[.02]")+(busy===k?" animate-pulse":"")}>
+      {on&&<span aria-hidden className="absolute -top-2 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-5 h-5 rounded-full bg-amber text-[#1A1206] text-[11px] grid place-items-center shadow">✓</span>}
+      <bdi className="line-clamp-2 break-words">{t}</bdi></button>})}</div>
    {msg&&<p role="status" className="text-sm mt-3 text-[#C9CCE0]">{msg}</p>}</div>);
 }

@@ -16,7 +16,7 @@ const RES:Record<string,[string,string]>={W:["ف","bg-teal text-bg"],D:["ت","bg
 
 const num=(s:any)=>{const v=parseFloat(String(s??"").replace(/[^\d.\-]/g,""));return isNaN(v)?0:v};
 const L=({children}:{children:React.ReactNode})=><bdi>{children}</bdi>;
-const Card=({t,children}:{t:string;children:React.ReactNode})=><section className="rounded-2xl bg-card border border-line p-5 min-w-0"><h2 className="text-lg font-semibold text-white mb-4">{t}</h2>{children}</section>;
+const Card=({t,children}:{t:string;children:React.ReactNode})=><section className="panel p-5 min-w-0"><h2 className="font-display text-xl text-white mb-4 flex items-center gap-2"><i aria-hidden className="w-1.5 h-5 rounded-full bg-teal"/>{t}</h2>{children}</section>;
 
 function evKind(t:string):Ev["kind"]|null{t=t.toLowerCase();
  if(t.includes("own goal"))return"og";if(t.includes("penalty")&&t.includes("goal"))return"pen";if(t.includes("goal"))return"goal";

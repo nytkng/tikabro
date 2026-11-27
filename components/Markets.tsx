@@ -10,12 +10,12 @@ const Group=({title,hint,children}:{title:string;hint?:string;children:React.Rea
 export default function Markets({x,home,away}:{x:Ext;home:string;away:string}){
   const hot=(a:number,b:number)=>[a>=b&&a>=58,b>a&&b>=58];
   const [byH,byN]=hot(x.btts.yes,x.btts.no);
-  return(<section className="rounded-2xl bg-card border border-line p-6 sm:p-7 flex flex-col gap-7">
-    <div><h2 className="text-lg font-semibold text-white">تنبؤات إضافية</h2>
+  return(<section className="panel p-5 sm:p-6 flex flex-col gap-7">
+    <div><h2 className="font-display text-xl text-white flex items-center gap-2"><i aria-hidden className="w-1.5 h-5 rounded-full bg-teal"/>تنبؤات إضافية</h2>
      <p className="text-sm text-mute mt-1 leading-7">كلها من نفس النموذج. الأخضر = ما يميل له الـ AI بنسبة 58% وأكثر. <b className="text-white">نسب فقط، بلا أسعار ولا مراهنة.</b></p></div>
-    <div className="rounded-xl bg-bg border border-line p-4"><div className="text-sm text-mute mb-2">لماذا هذه الأرقام؟ الأهداف المتوقعة</div>
-     <div className="flex items-center justify-between text-white"><span>{home}</span><b dir="ltr" className="text-2xl tabular-nums">{x.xg.h.toFixed(1)}</b></div>
-     <div className="flex items-center justify-between text-white mt-1"><span>{away}</span><b dir="ltr" className="text-2xl tabular-nums">{x.xg.a.toFixed(1)}</b></div>
+    <div className="scoreboard rounded-xl p-4"><div className="text-sm text-mute mb-2">لماذا هذه الأرقام؟ الأهداف المتوقعة</div>
+     <div className="flex items-center justify-between text-white"><bdi>{home}</bdi><b dir="ltr" className="text-2xl tabular-nums">{x.xg.h.toFixed(1)}</b></div>
+     <div className="flex items-center justify-between text-white mt-1"><bdi>{away}</bdi><b dir="ltr" className="text-2xl tabular-nums">{x.xg.a.toFixed(1)}</b></div>
      <p className="text-xs text-mute mt-3 leading-6">محسوبة من أهداف كل فريق المسجلة والمستقبلة في الجدول، مع أفضلية الأرض.</p></div>
     <Group title="الفرصة المزدوجة"><Cell t={`${home} أو تعادل`} v={x.dc.x1} hot={x.dc.x1>=58&&x.dc.x1>=x.dc.x2}/><Cell t={`${away} أو تعادل`} v={x.dc.x2} hot={x.dc.x2>=58&&x.dc.x2>x.dc.x1}/><Cell t="فوز أحد الفريقين (بلا تعادل)" v={x.dc.x12} hot={x.dc.x12>=58}/></Group>
     <Group title="كلا الفريقين يسجلان"><Cell t="نعم" v={x.btts.yes} hot={byH}/><Cell t="لا" v={x.btts.no} hot={byN}/></Group>

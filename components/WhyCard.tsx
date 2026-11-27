@@ -20,9 +20,9 @@ export default async function WhyCard({m,sportPath,eid}:{m:Match;sportPath:strin
   if(p.d>=28)lines.push(`التعادل وارد بزاف هنا (${p.d}%)، المباراة مغلقة.`);
   else if(fp<50)lines.push(`ما كاينش مرشّح واضح: ${fav} عندو ${fp}% برك، و${dog} يقدر يفاجئ.`);
   else lines.push(`${fav} مرشّح بـ ${fp}%، يعني يخسر تقريبا ${Math.round((100-fp)/10)} مرات من 10 في مباريات كيما هذي.`);
-  return(<section className="rounded-2xl bg-card border border-line p-5">
-    <h2 className="font-semibold text-white mb-3">علاش الـ AI توقّع هكا؟</h2>
-    <ul className="flex flex-col gap-2.5 text-sm text-[#C9CCE0] leading-7">{lines.slice(0,4).map((t,i)=><li key={i} className="flex gap-3"><b className="text-amber">•</b><span>{t}</span></li>)}</ul>
+  return(<section className="panel invite p-5">
+    <h2 className="font-display text-xl text-white mb-4 flex items-center gap-2"><i aria-hidden className="w-1.5 h-5 rounded-full bg-amber"/>علاش الـ AI توقّع هكا؟</h2>
+    <ol className="steps flex flex-col gap-4 text-sm text-[#C9CCE0] leading-7">{lines.slice(0,4).map((t,i)=><li key={i}><b>{i+1}</b><span className="pt-0.5">{t}</span></li>)}</ol>
     <p className="text-xs text-mute mt-3">الأرقام احتمالات ماشي وعود. الـ AI يتعلّم من كل نتيجة ومن توقعات اللاعبين.</p>
   </section>);
 }
