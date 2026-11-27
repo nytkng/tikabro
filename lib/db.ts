@@ -7,3 +7,13 @@ export async function db<T=unknown>(path:string,init:RequestInit={}):Promise<T|n
   if(!r.ok)return null;
   return (await r.json()) as T;
 }
+
+// نسخة تُرجع الحالة والخطأ (للتمييز بين تكرار الاسم وغيره)
+export async function dbRaw(path:string,init:RequestInit={}):Promise<{ok:boolean;status:number;json:any}>{
+  const url=supaOrigin(process.env.SUPABASE_URL),key=process.env.SUPABASE_SERVICE_KEY?.trim();
+  if(!url||!key)return {ok:false,status:0,json:null};
+  try{
+    const r=await fetch(`${url}/rest/v1/${path}`,{...init,headers:{apikey:key,...(key.startsWith("sb_")?{}:{Authorization:`Bearer ${key}`}),"Content-Type":"application/json",...(init.headers||{})},cache:"no-store"});
+    return {ok:r.ok,status:r.status,json:await r.json().catch(()=>null)};
+  }catch{return {ok:false,status:0,json:null}}
+}
