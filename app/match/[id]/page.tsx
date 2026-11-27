@@ -13,6 +13,7 @@ import MatchCentre from "@/components/MatchCentre";
 import PickButtons from "@/components/PickButtons";
 import CrowdVsAI from "@/components/CrowdVsAI";
 import ShareCard from "@/components/ShareCard";
+import WhyCard from "@/components/WhyCard";
 import {sha256} from "@/lib/auth";
 import {headers} from "next/headers";
 export default async function MatchPage({params}:{params:Promise<{id:string}>}){
@@ -72,6 +73,7 @@ export default async function MatchPage({params}:{params:Promise<{id:string}>}){
     :<><p className="text-sm text-mute mb-4">سجّل الدخول لتختم توقعك قبل البداية.</p><a href="/login" className="btn inline-flex items-center px-6 rounded-xl bg-violet text-bg font-semibold">دخول لتختم توقعك</a></>}
    </section>
    {!m.sample&&<CrowdVsAI home={m.home} away={m.away} hasDraw={["football","rugby","aussie"].includes(m.sport)} counts={counts} ai={aiK} mine={mine} revealed={!!mine||!open} outcome={outcome}/>}
+   {!m.sample&&<WhyCard m={m} sportPath={key.split("-")[0]} eid={eid}/>}
    {!m.sample&&<MatchCentre id={key}/>}
    {m.ext&&<Markets x={m.ext} home={m.home} away={m.away}/>}
   </div>);
