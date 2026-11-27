@@ -38,7 +38,7 @@ const D={
  ai_pick:{ar:"اختيار الـ AI",fr:"Choix de l'IA",en:"AI pick"},
  hit:{ar:"صاب",fr:"Juste",en:"Right"},
  miss:{ar:"غلط",fr:"Faux",en:"Wrong"},
- low_data:{ar:"بيانات قليلة للتوقع",fr:"Pas assez de données",en:"Not enough data"},
+ low_data:{ar:"بلا توقع: بيانات قليلة",fr:"Pas de pronostic : données insuffisantes",en:"No prediction: too little data"},
  home_side:{ar:"صاحب الأرض",fr:"Domicile",en:"Home"},
  away_side:{ar:"الضيف",fr:"Extérieur",en:"Away"},
  sealed:{ar:"مختوم",fr:"Scellé",en:"Sealed"},
@@ -190,6 +190,8 @@ const D={
  "fl.on":{ar:"راك تتابع هذي المباراة",fr:"Match suivi",en:"Following this match"},
  "fl.denied":{ar:"الإشعارات مسدودة في المتصفح. حلّها من الإعدادات.",fr:"Notifications bloquées dans le navigateur. Activez-les dans les réglages.",en:"Notifications are blocked in your browser. Allow them in settings."},
  "fl.err":{ar:"ما خدمتش. عاود جرّب.",fr:"Échec. Réessayez.",en:"That didn't work. Try again."},
+ "mr.ai_t":{ar:"احتمال {x} حسب الـ AI",fr:"Probabilité de {x} selon l'IA",en:"AI probability of {x}"},
+ "mr.was_draw":{ar:"والنتيجة تعادل",fr:"mais match nul",en:"but it was a draw"},
  "w.note":{ar:"الأرقام احتمالات ماشي وعود. الـ AI يتعلّم من كل نتيجة ومن توقعات اللاعبين.",fr:"Les chiffres sont des probabilités, pas des promesses. L'IA apprend de chaque résultat et des pronostics des joueurs.",en:"Numbers are probabilities, not promises. The AI learns from every result and from players' picks."},
  // بطاقة المشاركة
  "s.btn":{ar:"شارك توقعك (صورة)",fr:"Partager mon pronostic (image)",en:"Share your pick (image)"},

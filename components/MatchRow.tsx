@@ -32,10 +32,10 @@ export default function MatchRow({m,lang="ar",hist}:{m:Match;lang?:Lang;hist?:[n
      :post?<span className="text-[11px] text-mute">{t(lang,"final")}</span>:<span className="text-[13px] text-[#D5D8E6] font-semibold tabular-nums">{time(m.kickoff,lang)}</span>}</span>
    <span className="pointer-events-none min-w-0 flex flex-col gap-1">{team(m.home,m.homeLogo,m.score?.[0],win(0),pk==="h",m.homeForm)}{team(m.away,m.awayLogo,m.score?.[1],win(1),pk==="a",m.awayForm)}</span>
    {p&&pk?<span className="pointer-events-none col-start-2 sm:col-start-3 flex items-center gap-2 min-w-0">
-     <span className={"ai-chip shrink-0 "+(aiHit===true?"hit":aiHit===false?"miss":"")}><span className="opacity-70">AI</span><b className="tabular-nums" dir="ltr">{p[pk]}%</b></span>
+     <span title={t(lang,"mr.ai_t",{x:label})} className={"ai-chip shrink-0 "+(aiHit===true?"hit":aiHit===false?"miss":"")}><span className="opacity-70">AI</span><b className="tabular-nums" dir="ltr">{p[pk]}%</b></span>
      <span className="flex-1 min-w-0 flex flex-col gap-1">
       <span className="flex h-[5px] rounded-full overflow-hidden gap-[2px] bg-line" aria-hidden><i style={{width:p.h+"%"}} className="bg-violet"/>{p.d>0&&<i style={{width:p.d+"%"}} className="bg-[#4A5273]"/>}<i style={{width:p.a+"%"}} className="bg-pink"/></span>
-      <span className="flex items-center gap-1.5 min-w-0 text-[11px]"><span className="text-mute truncate flex-1 min-w-0">{aiHit===true?t(lang,"hit")+": ":aiHit===false?t(lang,"miss")+": ":""}<bdi className="text-[#C9CCE0]">{label}</bdi></span>
+      <span className="flex items-center gap-1.5 min-w-0 text-[11px]"><span className="text-mute truncate flex-1 min-w-0">{aiHit===true?t(lang,"hit")+": ":aiHit===false?t(lang,"miss")+": ":""}<bdi className="text-[#C9CCE0]">{label}</bdi>{aiHit===false&&m.score&&m.score[0]===m.score[1]?" · "+t(lang,"mr.was_draw"):""}</span>
        {tv&&t0!==t1&&<span title={t(lang,"d2.trend")} className={"flex items-center gap-1 shrink-0 tabular-nums "+(t1>t0?"text-win":"text-loss")}><bdi dir="ltr">{t0}% → {t1}%</bdi><Trend v={tv}/></span>}
        {!post&&<a href={href+"#why"} title={t(lang,"d2.why")} aria-label={t(lang,"d2.why")} className="pointer-events-auto relative z-10 shrink-0 grid place-items-center w-6 h-6 -my-1 rounded-full border border-line text-mute hover:text-white hover:border-[#3A4352]">؟</a>}</span>
       {!post&&!live&&<span className="honest text-[10px] text-mute leading-4 truncate">{t(lang,"d2.honest",{p:p[pk],n:Math.round(p[pk]/10)})}</span>}

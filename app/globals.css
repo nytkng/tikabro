@@ -100,3 +100,4 @@ html.lite .font-display{font-family:system-ui,sans-serif;font-weight:700}
 html.lite img{display:none!important}
 html.lite .crest{background:#232A36}
 html.lite *,html.lite *::before,html.lite *::after{animation:none!important;transition:none!important;backdrop-filter:none!important;box-shadow:none!important}
+.empty-note::before{content:attr(data-t)}

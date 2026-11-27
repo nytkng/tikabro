@@ -144,8 +144,8 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
         <a href={list[0].slug&&list[0].slug!=="all"?`/league/${list[0].id.split("-")[0]}/${list[0].slug}`:q({l:name})} className="text-[11px] text-violet hover:text-white px-2 min-h-11 inline-flex items-center">{t(lang,"h.league")}</a>
         <span aria-hidden className="chev"/>
        </summary>
-       <div className="p-1.5 flex flex-col">{list.map(m=><MatchRow key={m.id} m={m} lang={lang} hist={hm.get(hid(m))}/>)}</div>
-       <p className="empty-note text-xs text-mute px-4 pb-3">{t(lang,"h.empty_filter")}</p>
+       <div className="p-1.5 flex flex-col">{[...list].sort((a,b)=>Number(!a.probs)-Number(!b.probs)).map(m=><MatchRow key={m.id} m={m} lang={lang} hist={hm.get(hid(m))}/>)}</div>
+       <p className="empty-note text-xs text-mute px-4 pb-3" data-t={t(lang,"h.empty_filter")}/>
       </details>)}</div>
      </div>
      :<div className="panel p-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-start"><p className="text-sm text-[#C9CCE0] leading-6">{empty.msg}</p>
