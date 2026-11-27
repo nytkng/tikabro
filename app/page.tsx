@@ -77,7 +77,7 @@ export default async function Home({searchParams}:{searchParams:Promise<{s?:stri
       <div className="mt-5 text-center"><span className="inline-flex items-center h-11 px-6 rounded-xl bg-white !text-[#0B0D14] font-semibold text-sm">{top.state==="pre"?"اختم توقعك ضد الـ AI":"تابع المباراة"}</span></div>
      </a>}
      {ordered.length?<div className="flex flex-col gap-3">{ordered.map(([name,list])=><section key={name} className={card+" overflow-hidden"}>
-       <a href={q({l:list[0].slug&&list[0].slug!=="all"?list[0].slug:name})} className="flex items-center gap-2.5 px-4 h-12 bg-[#0E1220] border-b border-line text-[14px] font-semibold text-white hover:text-violet">
+       <a href={list[0].slug&&list[0].slug!=="all"?`/league/${list[0].id.split("-")[0]}/${list[0].slug}`:q({l:name})} className="flex items-center gap-2.5 px-4 h-12 bg-[#0E1220] border-b border-line text-[14px] font-semibold text-white hover:text-violet">
         {list[0].leagueLogo?<img src={list[0].leagueLogo} alt="" width={22} height={22} loading="lazy" referrerPolicy="no-referrer" className="w-[22px] h-[22px] object-contain"/>:null}<span className="flex-1 truncate">{name}</span><span className="text-xs text-mute font-normal">{list.length}</span></a>
        <div className="px-2">{list.map(m=><MatchRow key={m.id} m={m}/>)}</div></section>)}</div>
      :<p className={card+" text-mute p-10 text-center"}>ما كاين حتى ماتش هنا {date===today?"اليوم":"في هذا اليوم"}. جرّب يوم آخر ولا رياضة أخرى.</p>}
