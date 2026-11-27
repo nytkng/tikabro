@@ -5,6 +5,9 @@ import Calibration,{type Bin} from "@/components/charts/Calibration";
 import Meter from "@/components/charts/Meter";
 import Crest from "@/components/Crest";
 import {arLeague} from "@/lib/arabic";
+import {LeagueBubbles} from "@/components/viz/Viz";
+import {getLang} from "@/lib/lang";
+import {t} from "@/lib/i18n";
 export const metadata={title:"سجل الـ AI"};
 type S={grp:string;k:string;n:number;hits:number;brier:number|null;logloss:number|null;crowd_cnt:number;crowd_brier:number|null;model_brier_c:number|null};
 type W={match_id:string;league:string|null;home:string;away:string;pick:string;outcome:string;prob:number;home_logo:string|null;away_logo:string|null;score_h:number|null;score_a:number|null};
@@ -38,6 +41,7 @@ function local(rows:R[]){
 }
 
 export default async function AI(){
+  const lang=await getLang();
   const [s0,c0,w0]=await Promise.all([db<S[]>("rpc/ai_summary"),db<Bin[]>("rpc/ai_calibration",{method:"POST",body:"{}"}),db<W[]>("rpc/ai_worst?p_limit=8")]);
   let summary=s0,bins=c0,worst=w0;
   if(!summary||!bins||!worst){
@@ -71,6 +75,10 @@ export default async function AI(){
 
    {vers.length>0&&<section className={card}><h2 className="text-lg font-semibold text-white mb-4">مقارنة نسخ النموذج</h2><Table rows={vers} name={k=><bdi>{VER[k]||k}</bdi>}/></section>}
    {lgs.length>0&&<section className={card}><h2 className="text-lg font-semibold text-white mb-4">حسب الدوري</h2><Table rows={lgs} name={k=>arLeague(k)||NAMES[k]||<bdi>{k}</bdi>}/></section>}
+
+   {lgs.filter(s=>s.n>=5).length>=2&&<section className={card}><h2 className="text-lg font-semibold text-white mb-1">{t(lang,"viz.bubble")}</h2>
+    <p className="text-sm text-mute mb-4 leading-7">{t(lang,"viz.bubble_note")}</p>
+    <LeagueBubbles lang={lang} data={lgs.map(s=>({k:s.k,label:(lang==="ar"?arLeague(s.k)||NAMES[s.k]:null)||s.k,n:s.n,hit:pct(s.hits,s.n)}))}/></section>}
 
    {n>0&&<section className={card}>
     <h2 className="text-lg font-semibold text-white mb-1">هل يصدق في احتمالاتو؟</h2>

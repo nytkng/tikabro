@@ -104,14 +104,18 @@ async function load(id:string){
 function Chips({g,lang}:{g:G[];lang:Lang}){return <div className="flex gap-1.5 flex-wrap">{g.map((x,i)=>{const r=RES[x.res]||["–","bg-line text-mute"];
  return <span key={i} title={`${x.opp} ${x.score}`} className={"w-7 h-7 rounded-lg text-sm font-bold flex items-center justify-center "+r[1]}>{RES_L[lang][x.res]||r[0]}</span>})}</div>}
 
-export default async function MatchCentre({id,lang="ar"}:{id:string;lang?:Lang}){
- const d=await load(id);if(!d)return null;
+export default async function MatchCentre({id,lang="ar",part="all"}:{id:string;lang?:Lang;part?:"stats"|"h2h"|"lineups"|"all"}){
+ const on=(x:"stats"|"h2h"|"lineups")=>part==="all"||part===x;
+ const empty=<section className="panel p-5 text-sm text-mute">{t(lang,"viz.mc_empty")}</section>;
+ const d=await load(id);if(!d)return part==="all"?null:empty;
+ const has={stats:d.events.length+d.scoring.length+d.leaders.length+d.stats.length+d.table.length>0,h2h:d.h2h.length+d.form.home.length+d.form.away.length>0,lineups:d.lineups.some(l=>l.p.length>0)};
+ if(part!=="all"&&!has[part])return empty;
  const kt=(k:Ev["kind"])=>lang==="ar"?KTXT[k]:KTXT_L[lang][k];
  const pos=(p:string)=>lang==="ar"?(POS[p]||p):lang==="fr"?(POS_FR[p]||p):p;
  const tName=lang==="ar"?"الترتيب"+(arLeague(d.tSlug)?" · "+arLeague(d.tSlug):""):(d.tRaw?t(lang,"mc.table")+" · "+d.tRaw:"");
  const {home,away}=d;const hasLine=d.lineups.some(l=>l.p.length>0);
  return(<div className="flex flex-col gap-6 min-w-0">
-  {d.events.length>0&&<Card t={t(lang,"mc.events")}><ol className="flex flex-col gap-2">{d.events.map((e,i)=>
+  {on("stats")&&d.events.length>0&&<Card t={t(lang,"mc.events")}><ol className="flex flex-col gap-2">{d.events.map((e,i)=>
    <li key={i} className={"flex items-center gap-3 text-sm "+(e.side==="away"?"flex-row-reverse text-end":"")}>
     <span className="w-12 flex-none text-center font-display text-amber tabular-nums" dir="ltr">{e.min}</span>
     <span className="flex-none" aria-label={kt(e.kind)}>{ICON[e.kind]}</span>
@@ -119,7 +123,7 @@ export default async function MatchCentre({id,lang="ar"}:{id:string;lang?:Lang})
    </li>)}</ol>
    <div className="flex justify-between text-xs text-mute mt-3"><L>{home.name}</L><L>{away.name}</L></div></Card>}
 
-  {(d.scoring.length>0||d.leaders.length>0)&&<Card t={t(lang,"mc.events")}>
+  {on("stats")&&(d.scoring.length>0||d.leaders.length>0)&&<Card t={t(lang,"mc.events")}>
    {d.leaders.length>0&&<div className="grid grid-cols-2 gap-3 mb-4">{(["home","away"] as const).map(sd=><div key={sd} className="min-w-0">
     <div className={"text-xs mb-2 "+(sd==="home"?"text-violet":"text-pink")}><L>{sd==="home"?home.name:away.name}</L></div>
     {d.leaders.filter(l=>l.side===sd).map((l,i)=><div key={i} className="text-sm mb-1.5 min-w-0"><div className="text-mute text-xs truncate"><L>{l.cat}</L></div><div className="text-white truncate"><L>{l.who}</L> <bdi dir="ltr" className="text-amber tabular-nums">{l.v}</bdi></div></div>)}</div>)}</div>}
@@ -127,20 +131,20 @@ export default async function MatchCentre({id,lang="ar"}:{id:string;lang?:Lang})
     <span className="w-14 flex-none text-mute text-xs tabular-nums" dir="ltr">{[s.per?t(lang,"mc.period",{n:s.per}):"",s.t].filter(Boolean).join(" ")}</span><span className={"w-1.5 self-stretch rounded flex-none "+(s.side==="home"?"bg-violet":"bg-pink")}/>
     <span className="min-w-0 flex-1 break-words text-white"><L>{s.txt}</L></span><bdi dir="ltr" className="font-display tabular-nums text-amber flex-none">{s.sc}</bdi></li>)}</ol>}</Card>}
 
-  {d.stats.length>0&&<Card t={t(lang,"mc.stats")}>
+  {on("stats")&&d.stats.length>0&&<Card t={t(lang,"mc.stats")}>
    <div className="flex justify-between text-sm mb-3"><span className="text-violet font-semibold"><L>{home.name}</L></span><span className="text-pink font-semibold"><L>{away.name}</L></span></div>
    <div className="flex flex-col gap-3">{d.stats.map(s=>{const t=s.hv+s.av||1;const hp=Math.round(s.hv/t*100);const hw=s.hv>s.av,aw=s.av>s.hv;
     return <div key={s.k}><div className="flex justify-between items-baseline text-sm mb-1">
      <bdi dir="ltr" className={"font-display text-lg tabular-nums "+(hw?"text-white":"text-mute")}>{s.h}</bdi><span className="text-mute text-xs">{statLabel(s.k,d.soccer,lang)}</span><bdi dir="ltr" className={"font-display text-lg tabular-nums "+(aw?"text-white":"text-mute")}>{s.a}</bdi></div>
      <div className="flex h-2 rounded-full overflow-hidden gap-[3px] bg-bg"><i style={{width:hp+"%"}} className={"bg-violet "+(hw?"":"opacity-50")}/><i style={{width:(100-hp)+"%"}} className={"bg-pink "+(aw?"":"opacity-50")}/></div></div>})}</div></Card>}
 
-  {hasLine&&<Card t={t(lang,"mc.lineups")}><div className="grid grid-cols-2 gap-4">{d.lineups.map((l,i)=><div key={i} className="min-w-0">
+  {on("lineups")&&hasLine&&<Card t={t(lang,"mc.lineups")}><div className="grid grid-cols-2 gap-4">{d.lineups.map((l,i)=><div key={i} className="min-w-0">
    <div className={"flex justify-between items-center text-sm mb-2 "+(i===0?"text-violet":"text-pink")}><span className="font-semibold truncate"><L>{i===0?home.name:away.name}</L></span>{l.f&&<bdi dir="ltr" className="text-amber tabular-nums text-xs">{l.f}</bdi>}</div>
    <ul className="flex flex-col gap-1.5">{l.p.map((p,k)=><li key={k} className="flex items-center gap-2 text-sm min-w-0">
     <span className={"w-7 h-7 flex-none rounded-lg flex items-center justify-center font-display tabular-nums text-bg "+(i===0?"bg-violet":"bg-pink")}>{p.j}</span>
     <span className="truncate text-white min-w-0 flex-1"><L>{p.n}</L></span>{p.pos&&<span className="text-[10px] text-mute flex-none">{pos(p.pos)}</span>}</li>)}</ul></div>)}</div></Card>}
 
-  {(d.h2h.length>0||d.form.home.length>0||d.form.away.length>0)&&<Card t={t(lang,"mc.h2h")}>
+  {on("h2h")&&(d.h2h.length>0||d.form.home.length>0||d.form.away.length>0)&&<Card t={t(lang,"mc.h2h")}>
    {d.h2h.length>0&&<div className="mb-5"><div className="text-xs text-mute mb-2">{t(lang,"mc.h2h_of")} <L>{home.name}</L>)</div>
     <ul className="flex flex-col gap-1.5 text-sm">{d.h2h.map((g,i)=>{const r=RES[g.res];const rl=RES_L[lang][g.res];return <li key={i} className="flex items-center gap-3">
      <span className={"w-6 h-6 rounded-md text-xs font-bold flex items-center justify-center flex-none "+(r?.[1]||"bg-line text-mute")}>{(r&&rl)||"–"}</span>
@@ -149,7 +153,7 @@ export default async function MatchCentre({id,lang="ar"}:{id:string;lang?:Lang})
    <div className="grid grid-cols-2 gap-4">{(["home","away"] as const).map(sd=>d.form[sd].length>0&&<div key={sd} className="min-w-0">
     <div className={"text-sm mb-2 truncate "+(sd==="home"?"text-violet":"text-pink")}><L>{sd==="home"?home.name:away.name}</L></div><Chips g={d.form[sd]} lang={lang}/></div>)}</div></Card>}
 
-  {d.table.length>0&&<Card t={t(lang,"mc.table")}>
+  {on("stats")&&d.table.length>0&&<Card t={t(lang,"mc.table")}>
    {tName&&<div className="text-xs text-mute -mt-3 mb-3"><L>{tName}</L></div>}
    <table className="w-full text-sm tabular-nums"><thead><tr className="text-mute text-xs"><th className="text-start font-normal w-8">#</th><th className="text-start font-normal">{t(lang,"mc.team")}</th><th className="font-normal w-10">{t(lang,"mc.gp")}</th><th className="font-normal w-12">{t(lang,"mc.pts")}</th></tr></thead>
     <tbody>{d.table.map((r,i)=><tr key={i} className={"border-t border-line "+(r.me==="home"?"text-violet font-semibold":r.me==="away"?"text-pink font-semibold":"text-white")}>
