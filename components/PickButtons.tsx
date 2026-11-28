@@ -3,8 +3,9 @@ import {useState} from "react";
 import {useRouter} from "next/navigation";
 import {t,type Lang} from "@/lib/i18n";
 type K="home"|"draw"|"away";
-export default function PickButtons({matchId,home,away,hasDraw,current,lang="ar"}:{matchId:string;home:string;away:string;hasDraw:boolean;current:K|null;lang?:Lang}){
+export default function PickButtons({matchId,home,away,hasDraw,current,conf=null,lang="ar"}:{matchId:string;home:string;away:string;hasDraw:boolean;current:K|null;conf?:number|null;lang?:Lang}){
   const router=useRouter();
+  const [cf,setCf]=useState<number|null>(conf),[cbusy,setCbusy]=useState(false);
   const [cur,setCur]=useState<K|null>(current),[busy,setBusy]=useState<K|null>(null),[msg,setMsg]=useState("");
   async function go(k:K){
     setBusy(k);setMsg("");
@@ -15,11 +16,21 @@ export default function PickButtons({matchId,home,away,hasDraw,current,lang="ar"
     }catch{setMsg(t(lang,"conn"))}
     setBusy(null);
   }
+  async function setConf(v:number){
+    setCbusy(true);setMsg("");
+    try{const r=await fetch("/api/conf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({matchId,conf:v})});
+      const j=await r.json().catch(()=>({}));if(r.ok){setCf(v);setMsg(t(lang,"cf.ok",{p:v}))}else setMsg(j.msg||t(lang,"err"))}catch{setMsg(t(lang,"conn"))}
+    setCbusy(false);
+  }
   const opts:[K,string,string][]=[["home",t(lang,"win",{t:home}),"from-[#9C8FFF] to-[#7565F0]"],...(hasDraw?[["draw",t(lang,"draw"),"from-[#5A6388] to-[#434B6C]"] as [K,string,string]]:[]),["away",t(lang,"win",{t:away}),"from-[#F08DB5] to-[#D9638F]"]];
   return(<div><div role="radiogroup" aria-label={t(lang,"m.your_pick")} className="seg !gap-1.5 !p-1.5 !rounded-2xl">{opts.map(([k,t,c])=>{const on=cur===k;
     return <button key={k} role="radio" aria-checked={on} onClick={()=>go(k)} disabled={!!busy}
       className={"relative flex-1 min-w-0 min-h-[60px] rounded-xl px-2 py-2 text-[14px] font-semibold leading-5 text-center transition-[transform,background,box-shadow] duration-150 active:scale-[.95] active:translate-y-px motion-reduce:transform-none "+(on?`bg-gradient-to-b ${c} text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,.8),inset_0_1px_0_rgba(255,255,255,.35)]`:"text-[#C9CCE0] hover:bg-white/5 shadow-[inset_0_-2px_0_rgba(0,0,0,.35)] bg-white/[.02]")+(busy===k?" animate-pulse":"")}>
       {on&&<span aria-hidden className="absolute -top-2 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-5 h-5 rounded-full bg-violet text-white text-[11px] grid place-items-center shadow">✓</span>}
       <bdi className="line-clamp-2 break-words">{t}</bdi></button>})}</div>
+   {cur&&<div className="mt-4"><p className="text-sm text-[#C9CCE0] mb-2">{t(lang,"cf.q")}</p>
+    <div role="radiogroup" aria-label={t(lang,"cf.q")} className="flex gap-1.5">{[55,65,75,85,95].map(v=><button key={v} role="radio" aria-checked={cf===v} disabled={cbusy} onClick={()=>setConf(v)}
+      className={"flex-1 h-11 rounded-xl text-sm font-semibold tabular-nums border transition-colors "+(cf===v?"bg-white text-[#0B0E13] border-white":"border-line text-[#C9CCE0] hover:bg-hover")} dir="ltr">{v}%</button>)}</div>
+    <p className="text-xs text-mute mt-2 leading-6">{t(lang,"cf.note")}</p></div>}
    {msg&&<p role="status" className="text-sm mt-3 text-[#C9CCE0]">{msg}</p>}</div>);
 }

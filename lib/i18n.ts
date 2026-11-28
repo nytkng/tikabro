@@ -206,6 +206,12 @@ const D={
  "pr.title":{ar:"Peer score: شكون يغلب الجمهور؟",fr:"Peer score : qui bat la foule ?",en:"Peer score: who beats the crowd?"},
  "pr.note":{ar:"ماشي غير شحال صبت: شحال صبت في المباريات اللي غلط فيها الناس. +10 معناها تصيب 10% أكثر من الجمهور في نفس المباريات. الأخضر يغلب، الأحمر يخسر.",fr:"Pas seulement combien tu as eu juste : combien tu as eu juste là où les autres se trompaient. +10 = 10 % de mieux que la foule sur les mêmes matchs.",en:"Not just how often you're right: how often you're right where others were wrong. +10 means 10% better than the crowd on the same games."},
  "pr.vs_ai":{ar:"الفرق مع الـ AI في نفس المباريات",fr:"Écart avec l'IA sur les mêmes matchs",en:"Difference vs the AI on the same games"},
+ "cf.q":{ar:"شحال راك متأكد؟",fr:"Quelle est ta certitude ?",en:"How sure are you?"},
+ "cf.note":{ar:"اختياري. كي تكون متأكد بزاف وتصيب تربح أكثر، وكي تغلط تخسر أكثر. يتحسب بـ Brier.",fr:"Facultatif. Très sûr et juste = plus de gain ; très sûr et faux = plus de perte. Score de Brier.",en:"Optional. Very sure and right scores more; very sure and wrong costs more. Brier score."},
+ "cf.ok":{ar:"تختمت: {p}%",fr:"Scellé : {p} %",en:"Sealed: {p}%"},
+ "cf.pick_first":{ar:"اختار النتيجة قبل.",fr:"Choisis d'abord un résultat.",en:"Pick a result first."},
+ "cb.title":{ar:"الأدق في الثقة (Brier)",fr:"Les plus justes en certitude (Brier)",en:"Best-calibrated (Brier)"},
+ "cb.note":{ar:"كل ما يصغر الرقم خير. 0.25 كيما واحد يقول 50% ديما. هنا يربح اللي يعرف شحال يعرف.",fr:"Plus bas = mieux. 0,25 = toujours dire 50 %. Ici gagne celui qui sait ce qu'il sait.",en:"Lower is better. 0.25 = always saying 50%. Here the winner knows what they know."},
  "w.note":{ar:"الأرقام احتمالات ماشي وعود. الـ AI يتعلّم من كل نتيجة ومن توقعات اللاعبين.",fr:"Les chiffres sont des probabilités, pas des promesses. L'IA apprend de chaque résultat et des pronostics des joueurs.",en:"Numbers are probabilities, not promises. The AI learns from every result and from players' picks."},
  // بطاقة المشاركة
  "s.btn":{ar:"شارك توقعك (صورة)",fr:"Partager mon pronostic (image)",en:"Share your pick (image)"},

@@ -56,6 +56,7 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
   const me=await currentPlayer();
   const eid=key.split(":")[1];
   const mine=me&&!m.sample?(await db<{pick:"home"|"draw"|"away"}[]>(`picks?player_id=eq.${me.id}&match_id=eq.${eid}&select=pick&limit=1`))?.[0]?.pick??null:null;
+  const myConf=mine?(await db<{conf:number}[]>(`pick_conf?player_id=eq.${me!.id}&match_id=eq.${eid}&select=conf&limit=1`).catch(()=>null))?.[0]?.conf??null:null;
   const open=m.state==="pre"&&!m.sample;
   const sealRow=m.sample?null:(await db<{p_home:number;p_draw:number|null;p_away:number;model_version:string;created_at:string}[]>(`predictions?match_id=eq.${eid}&select=p_home,p_draw,p_away,model_version,created_at&limit=1`))?.[0]??null;
   const sc=(x:number)=>Math.round(x<=1?x*100:x);
@@ -143,7 +144,7 @@ export default async function MatchPage({params,searchParams}:{params:Promise<{i
    <section className="panel p-5 sm:p-6"><H2 c="bg-violet">{t(lang,"m.your_pick")}</H2>
     {m.sample?<p className="text-sm text-mute">{t(lang,"m.sample")}</p>
     :!open?<p className="text-sm text-mute leading-7">{mine?<>{t(lang,"m.your_sealed")} <b className="text-white"><bdi>{mine==="home"?W(m.home):mine==="away"?W(m.away):DR}</bdi></b>. </>:""}{t(lang,"m.closed")}</p>
-    :me?<><p className="text-sm text-mute mb-4 leading-7">{t(lang,"m.choose")} <b className="text-white"><bdi>{me.nick}</bdi></b> {t(lang,"m.change")}</p><PickButtons lang={lang} matchId={key} home={m.home} away={m.away} hasDraw={hasDraw} current={mine}/>
+    :me?<><p className="text-sm text-mute mb-4 leading-7">{t(lang,"m.choose")} <b className="text-white"><bdi>{me.nick}</bdi></b> {t(lang,"m.change")}</p><PickButtons lang={lang} matchId={key} home={m.home} away={m.away} hasDraw={hasDraw} current={mine} conf={myConf}/>
       {mine&&<div className="mt-4"><ShareCard lang={lang} nick={me.nick} home={m.home} away={m.away} mine={mine==="home"?W(m.home):mine==="away"?W(m.away):DR} ai={aiK==="home"?W(m.home):aiK==="away"?W(m.away):aiK==="draw"?DR:null} aiPct={pp?(aiK==="home"?pp.h:aiK==="away"?pp.a:pp.d):null} kickoff={m.kickoff} url={url}/></div>}</>
     :<><p className="text-sm text-mute mb-4">{t(lang,"m.login_to")}</p><a href="/login" className="btn cta inline-flex items-center px-6 rounded-xl font-semibold">{t(lang,"m.login_cta")}</a></>}
    </section>
